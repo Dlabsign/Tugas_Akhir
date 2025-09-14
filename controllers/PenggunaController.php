@@ -102,13 +102,7 @@ class PenggunaController extends Controller
         return $this->redirect(['index']);
     }
 
-    /**
-     * Finds the Pengguna model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param int $id ID
-     * @return Pengguna the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
+   
     protected function findModel($id)
     {
         if (($model = Pengguna::findOne(['id' => $id])) !== null) {

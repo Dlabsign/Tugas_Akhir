@@ -3,6 +3,8 @@
 namespace app\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
 
 /**
  * This is the model class for table "matakuliah".
@@ -35,6 +37,7 @@ class Matakuliah extends \yii\db\ActiveRecord
             [['semester', 'flag'], 'integer'],
             [['nama'], 'string', 'max' => 255],
             [['nama'], 'unique'],
+            [['created_at'], 'safe'],
         ];
     }
 
@@ -47,9 +50,23 @@ class Matakuliah extends \yii\db\ActiveRecord
             'id' => 'ID',
             'nama' => 'Nama',
             'semester' => 'Semester',
+            'created_at' => 'Created At',
             'flag' => 'Flag',
         ];
     }
+
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => TimestampBehavior::class,
+                'createdAtAttribute' => 'created_at',
+                'updatedAtAttribute' => false, // kalau tidak perlu updated_at
+                'value' => new Expression('NOW()'),
+            ],
+        ];
+    }
+
     public function beforeSave($insert)
     {
         if (parent::beforeSave($insert)) {

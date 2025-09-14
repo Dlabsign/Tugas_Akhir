@@ -55,6 +55,9 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                 $items[] = ['label' => 'Laboratorium', 'url' => ['/laboratorium/index']];
                 $items[] = ['label' => 'Mata Kuliah', 'url' => ['/matakuliah/index']];
                 $items[] = ['label' => 'Jadwal', 'url' => ['/jadwal/index']];
+                $items[] = ['label' => 'Soal', 'url' => ['/soal/index']];
+                $items[] = ['label' => 'Absensi', 'url' => ['/absensi/index']];
+                $items[] = ['label' => 'Mahasiswa', 'url' => ['/mahasiswa/index']];
             }
 
             $items[] = '<li class="nav-item">'

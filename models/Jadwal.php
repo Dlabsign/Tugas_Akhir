@@ -3,42 +3,24 @@
 namespace app\models;
 
 use Yii;
+use yii\behaviors\TimestampBehavior;
+use yii\db\Expression;
 
-/**
- * This is the model class for table "jadwal".
- *
- * @property int $id
- * @property int $matakuliah_id
- * @property int $jumlah_peserta
- * @property int $laboratorium_id
- * @property string $tanggal_jadwal
- * @property string $waktu_mulai
- * @property string $waktu_selesai
- * @property int $dibuat_oleh_staff_id
- * @property int|null $flag
- */
 class Jadwal extends \yii\db\ActiveRecord
 {
 
-
-    /**
-     * {@inheritdoc}
-     */
     public static function tableName()
     {
         return 'jadwal';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
             [['flag'], 'default', 'value' => null],
-            [['jumlah_peserta', 'laboratorium_id', 'tanggal_jadwal', 'waktu_mulai', 'waktu_selesai', 'dibuat_oleh_staff_id'], 'required'],
-            [['jumlah_peserta', 'laboratorium_id', 'dibuat_oleh_staff_id', 'flag', 'matakuliah_id'], 'integer'],
-            [['tanggal_jadwal', 'waktu_mulai', 'waktu_selesai'], 'safe'],
+            [['laboratorium_id', 'tanggal_jadwal', 'waktu_mulai', 'waktu_selesai', 'dibuat_oleh_staff_id','sesi'], 'required'],
+            [['laboratorium_id', 'dibuat_oleh_staff_id', 'flag', 'sesi', 'matakuliah_id'], 'integer'],
+            [['tanggal_jadwal', 'waktu_mulai', 'waktu_selesai', 'created_at'], 'safe'],
         ];
     }
 
@@ -50,13 +32,14 @@ class Jadwal extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'matakuliah_id' => 'Matakuliah ID',
-            'jumlah_peserta' => 'Jumlah Peserta',
+            'sesi' => 'Sesi',
             'laboratorium_id' => 'Laboratorium ID',
             'tanggal_jadwal' => 'Tanggal Jadwal',
             'waktu_mulai' => 'Waktu Mulai',
             'waktu_selesai' => 'Waktu Selesai',
             'dibuat_oleh_staff_id' => 'Dibuat Oleh Staff ID',
             'flag' => 'Flag',
+            'created_at' => 'Created At',
         ];
     }
 
@@ -65,6 +48,19 @@ class Jadwal extends \yii\db\ActiveRecord
         $this->flag = 0;
         return $this->save(false, ['flag']);
     }
+
+
+    public function beforeSave($insert)
+    {
+        if (parent::beforeSave($insert)) {
+            if ($this->isNewRecord) {
+                $this->flag = 1; // Set flag to 1 when creating a new record
+            }
+            return true;
+        }
+        return false;
+    }
+
 
     public function getLaboratorium()
     {
@@ -78,6 +74,6 @@ class Jadwal extends \yii\db\ActiveRecord
 
     public function getMatakuliah()
     {
-        return $this->hasOne(Matakuliah::class, ['id' => 'matakuliah_id']);
+        return $this->hasOne(Matakuliah::class, ['id' => 'matakuliah_id'])->where(['flag' => 1]);
     }
 }

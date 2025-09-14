@@ -4,12 +4,12 @@ namespace app\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Jadwal;
+use app\models\Mahasiswa;
 
 /**
- * JadwalSearch represents the model behind the search form of `app\models\Jadwal`.
+ * MahasiswaSearch represents the model behind the search form of `app\models\Mahasiswa`.
  */
-class JadwalSearch extends Jadwal
+class MahasiswaSearch extends Mahasiswa
 {
     /**
      * {@inheritdoc}
@@ -17,20 +17,30 @@ class JadwalSearch extends Jadwal
     public function rules()
     {
         return [
-            [['id', 'matakuliah_id',  'laboratorium_id', 'dibuat_oleh_staff_id', 'flag'], 'integer'],
-            [['tanggal_jadwal', 'waktu_mulai', 'waktu_selesai'], 'safe'],
+            [['id', 'nim', 'semester', 'sesi_id', 'nilai', 'nilai_akhir', 'absensi', 'flag'], 'integer'],
         ];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function scenarios()
     {
         // bypass scenarios() implementation in the parent class
         return Model::scenarios();
     }
 
+    /**
+     * Creates data provider instance with search query applied
+     *
+     * @param array $params
+     * @param string|null $formName Form name to be used into `->load()` method.
+     *
+     * @return ActiveDataProvider
+     */
     public function search($params, $formName = null)
     {
-        $query = Jadwal::find()->where(['flag' => 1]);
+        $query = Mahasiswa::find()->where(['flag' => 1]);
 
         // add conditions that should always apply here
 
@@ -49,12 +59,12 @@ class JadwalSearch extends Jadwal
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'matakuliah_id' => $this->matakuliah_id,
-            'laboratorium_id' => $this->laboratorium_id,
-            'tanggal_jadwal' => $this->tanggal_jadwal,
-            'waktu_mulai' => $this->waktu_mulai,
-            'waktu_selesai' => $this->waktu_selesai,
-            'dibuat_oleh_staff_id' => $this->dibuat_oleh_staff_id,
+            'nim' => $this->nim,
+            'semester' => $this->semester,
+            'sesi_id' => $this->sesi_id,
+            'nilai' => $this->nilai,
+            'nilai_akhir' => $this->nilai_akhir,
+            'absensi' => $this->absensi,
             'flag' => $this->flag,
         ]);
 

@@ -47,7 +47,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'semester',
             [
                 'label' => 'Laboratorium',
-                'attribute' => 'lab',
+                'attribute' => 'lab_id',
                 'value' => function ($model) {
                     return $model->laboratorium ? $model->laboratorium->nama : '-';
                 },

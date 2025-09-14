@@ -2,17 +2,16 @@
 
 namespace app\controllers;
 
-use app\models\Jadwal;
-use app\models\JadwalSearch;
-use Yii;
+use app\models\Absensi;
+use app\models\AbsensiSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * JadwalController implements the CRUD actions for Jadwal model.
+ * AbsensiController implements the CRUD actions for Absensi model.
  */
-class JadwalController extends Controller
+class AbsensiController extends Controller
 {
     /**
      * @inheritDoc
@@ -33,13 +32,13 @@ class JadwalController extends Controller
     }
 
     /**
-     * Lists all Jadwal models.
+     * Lists all Absensi models.
      *
      * @return string
      */
     public function actionIndex()
     {
-        $searchModel = new JadwalSearch();
+        $searchModel = new AbsensiSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
         return $this->render('index', [
@@ -49,7 +48,7 @@ class JadwalController extends Controller
     }
 
     /**
-     * Displays a single Jadwal model.
+     * Displays a single Absensi model.
      * @param int $id ID
      * @return string
      * @throws NotFoundHttpException if the model cannot be found
@@ -62,33 +61,21 @@ class JadwalController extends Controller
     }
 
     /**
-     * Creates a new Jadwal model.
+     * Creates a new Absensi model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return string|\yii\web\Response
      */
     public function actionCreate()
     {
-        $model = new Jadwal();
-        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
-            Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            if ($model->validate()) {
-                $model->save(false);
-                return ['success' => true];
-            } else {
-                return [
-                    'success' => false,
-                    'errors' => $model->getErrors(),
-                ];
-            }
-        }
+        $model = new Absensi();
 
-        // if ($this->request->isPost) {
-        //     if ($model->load($this->request->post()) && $model->save()) {
-        //         return $this->redirect(['view', 'id' => $model->id]);
-        //     }
-        // } else {
-        //     $model->loadDefaultValues();
-        // }
+        if ($this->request->isPost) {
+            if ($model->load($this->request->post()) && $model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
+        } else {
+            $model->loadDefaultValues();
+        }
 
         return $this->render('create', [
             'model' => $model,
@@ -96,7 +83,7 @@ class JadwalController extends Controller
     }
 
     /**
-     * Updates an existing Jadwal model.
+     * Updates an existing Absensi model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param int $id ID
      * @return string|\yii\web\Response
@@ -116,7 +103,7 @@ class JadwalController extends Controller
     }
 
     /**
-     * Deletes an existing Jadwal model.
+     * Deletes an existing Absensi model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param int $id ID
      * @return \yii\web\Response
@@ -130,15 +117,15 @@ class JadwalController extends Controller
     }
 
     /**
-     * Finds the Jadwal model based on its primary key value.
+     * Finds the Absensi model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param int $id ID
-     * @return Jadwal the loaded model
+     * @return Absensi the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Jadwal::findOne(['id' => $id])) !== null) {
+        if (($model = Absensi::findOne(['id' => $id])) !== null) {
             return $model;
         }
 

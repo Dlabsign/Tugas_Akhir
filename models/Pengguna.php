@@ -69,9 +69,9 @@ class Pengguna extends \yii\db\ActiveRecord implements IdentityInterface
         return null; // jika tidak pakai token
     }
 
-    public static function findByNim($nim)
+    public static function findByUsername($username)
     {
-        return static::findOne(['nim' => $nim, 'flag' => 1]);
+        return static::findOne(['username' => $username, 'flag' => 1]);
     }
 
     public function getId()

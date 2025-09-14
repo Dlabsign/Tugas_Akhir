@@ -4,11 +4,11 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /** @var yii\web\View $this */
-/** @var app\models\JadwalSearch $model */
+/** @var app\models\MahasiswaSearch $model */
 /** @var yii\widgets\ActiveForm $form */
 ?>
 
-<div class="jadwal-search">
+<div class="mahasiswa-search">
 
     <?php $form = ActiveForm::begin([
         'action' => ['index'],
@@ -17,24 +17,19 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'id') ?>
 
-    <?= $form->field($model, 'matakuliah_id') ?>
+    <?= $form->field($model, 'nim') ?>
 
+    <?= $form->field($model, 'semester') ?>
 
-    <?= $form->field($model, 'laboratorium_id') ?>
+    <?= $form->field($model, 'sesi_id') ?>
 
-    <?= $form->field($model, 'tanggal_jadwal') ?>
+    <?= $form->field($model, 'nilai') ?>
 
-    <?php // echo $form->field($model, 'waktu_mulai') 
-    ?>
+    <?php // echo $form->field($model, 'nilai_akhir') ?>
 
-    <?php // echo $form->field($model, 'waktu_selesai') 
-    ?>
+    <?php // echo $form->field($model, 'absensi') ?>
 
-    <?php // echo $form->field($model, 'dibuat_oleh_staff_id') 
-    ?>
-
-    <?php // echo $form->field($model, 'flag') 
-    ?>
+    <?php // echo $form->field($model, 'flag') ?>
 
     <div class="form-group">
         <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
