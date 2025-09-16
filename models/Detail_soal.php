@@ -30,13 +30,12 @@ class Detail_soal extends \yii\db\ActiveRecord
     {
         return [
             [['flag', 'nama_file', 'data'], 'default', 'value' => null],
-            [['bobot_soal', 'kode_soal', 'teks_soal', 'skor_maks'], 'required'],
-            [['matakuliah_id', 'sesi_id', 'bobot_soal', 'flag'], 'integer'],
+            [['kode_soal', 'teks_soal', 'skor_maks', 'sesi_id'], 'required'],
+            [['matakuliah_id', 'sesi_id',  'flag'], 'integer'],
             [['teks_soal', 'data'], 'string'],
             [['skor_maks'], 'number'],
             [['kode_soal'], 'string', 'max' => 50],
             [['nama_file'], 'string', 'max' => 255],
-            [['kode_soal'], 'unique'],
         ];
     }
     public function attributeLabels()

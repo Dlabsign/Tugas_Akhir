@@ -84,42 +84,68 @@ class SoalController extends Controller
     // }
 
 
+    // public function actionCreate()
+    // {
+    //     $modelsSoal = [new Detail_soal()];
+
+    //     if (Yii::$app->request->isPost) {
+    //         $modelsSoal = Detail_soal::createMultiple(Detail_soal::class);
+    //         Model::loadMultiple($modelsSoal, Yii::$app->request->post());
+
+    //         $valid = Model::validateMultiple($modelsSoal);
+
+    //         if ($valid) {
+    //             $sesiId     = $modelsSoal[0]->sesi_id;
+    //             $kodeSoal   = $modelsSoal[0]->kode_soal;
+
+    //             foreach ($modelsSoal as $modelSoal) {
+    //                 $modelSoal->sesi_id = $sesiId;
+    //                 $modelSoal->kode_soal = $kodeSoal;
+
+    //                 $jadwal = \app\models\Jadwal::findOne($sesiId);
+    //                 if ($jadwal) {
+    //                     $modelSoal->matakuliah_id = $jadwal->matakuliah_id;
+    //                 }
+
+    //                 $modelSoal->save(false);
+    //             }
+    //         }
+    //     }
+
+
+    //     return $this->render('create', [
+    //         'modelsSoal' => $modelsSoal,
+    //     ]);
+    // }
+
+
     public function actionCreate()
     {
         $modelsSoal = [new Detail_soal()];
 
         if (Yii::$app->request->isPost) {
-            $modelsSoal = Detail_soal::createMultiple(Detail_soal::class);
-            Model::loadMultiple($modelsSoal, Yii::$app->request->post());
-
-            $valid = Model::validateMultiple($modelsSoal);
-
-            if ($valid) {
-                // Ambil nilai umum dari input pertama
-                $sesiId     = $modelsSoal[0]->sesi_id;
-                $bobotSoal  = $modelsSoal[0]->bobot_soal;
-                $kodeSoal   = $modelsSoal[0]->kode_soal;
-
-                foreach ($modelsSoal as $modelSoal) {
-                    // set nilai umum ke setiap model
-                    $modelSoal->sesi_id = $sesiId;
-                    $modelSoal->bobot_soal = $bobotSoal;
-                    $modelSoal->kode_soal = $kodeSoal;
-
-                    // ambil matakuliah_id dari jadwal
-                    $jadwal = \app\models\Jadwal::findOne($sesiId);
-                    if ($jadwal) {
-                        $modelSoal->matakuliah_id = $jadwal->matakuliah_id;
+            $post = Yii::$app->request->post();
+            if (!empty($post['Detail_soal'])) {
+                $modelsSoal[0]->load($post);
+            }
+            if (!empty($post['soal'])) {
+                foreach ($post['soal'] as $data) {
+                    $model = new Detail_soal();
+                    $model->attributes = $data;
+                    $model->sesi_id = $post['Detail_soal']['sesi_id'] ?? null;
+                    $model->kode_soal = $post['Detail_soal']['kode_soal'] ?? null;
+                    if ($model->sesi_id) {
+                        $jadwal = \app\models\Jadwal::findOne($model->sesi_id);
+                        if ($jadwal) {
+                            $model->matakuliah_id = $jadwal->matakuliah_id;
+                        }
                     }
 
-                    $modelSoal->save(false);
+                    $model->save(false);
                 }
-
-                Yii::$app->session->setFlash('success', 'Semua soal berhasil disimpan.');
                 return $this->redirect(['index']);
             }
         }
-
 
         return $this->render('create', [
             'modelsSoal' => $modelsSoal,
