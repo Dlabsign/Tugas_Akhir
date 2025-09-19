@@ -23,7 +23,7 @@ class MahasiswaController extends Controller
             parent::behaviors(),
             [
                 'verbs' => [
-                    'class' => VerbFilter::className(),
+                    'class' => VerbFilter::class,
                     'actions' => [
                         'delete' => ['POST'],
                     ],
@@ -32,60 +32,46 @@ class MahasiswaController extends Controller
         );
     }
 
-    public function actionUpload()
+    public function actionUploadExcel()
     {
         $model = new UploadExcelForm();
 
         if (Yii::$app->request->isPost) {
             $model->excelFile = UploadedFile::getInstance($model, 'excelFile');
-            if ($model->upload()) {
-                // File berhasil diunggah, sekarang kita proses
-                $filePath = 'uploads/' . $model->excelFile->baseName . '.' . $model->excelFile->extension;
+            if ($model->validate()) {
+                // Load file excel
+                $spreadsheet = IOFactory::load($model->excelFile->tempName);
+                $sheet = $spreadsheet->getActiveSheet();
+                $rows = $sheet->toArray();
 
-                try {
-                    $spreadsheet = IOFactory::load($filePath);
-                    $worksheet = $spreadsheet->getActiveSheet();
-                    $highestRow = $worksheet->getHighestRow();
-                    $highestColumn = $worksheet->getHighestColumn();
+                // Lewati header (baris pertama)
+                foreach ($rows as $i => $row) {
+                    if ($i == 0) continue;
 
-                    // Mulai dari baris ke-2 untuk melewati header
-                    for ($row = 2; $row <= $highestRow; $row++) {
-                        // Asumsi: Kolom A = nim, Kolom B = semester
-                        $nim = $worksheet->getCell('A' . $row)->getValue();
-                        $semester = $worksheet->getCell('B' . $row)->getValue();
+                    $nim = trim($row[0]);       // kolom A
+                    $semester = trim($row[1]); // kolom B
 
-                        // Validasi sederhana, jika nim kosong, lewati baris
-                        if (empty($nim)) {
-                            continue;
-                        }
-
+                    if (!empty($nim) && !empty($semester)) {
                         $mahasiswa = new Mahasiswa();
                         $mahasiswa->nim = $nim;
                         $mahasiswa->semester = $semester;
-
-                        // Simpan data tanpa validasi (asumsi data excel sudah benar)
-                        // atau tambahkan validasi jika perlu dengan $mahasiswa->save()
-                        if (!$mahasiswa->save(false)) {
-                            // Jika ingin ada validasi, hapus `false`
-                            // Jika ada error saat menyimpan, tampilkan pesan
-                            Yii::$app->session->setFlash('error', "Gagal menyimpan data pada baris {$row}.");
-                            return $this->render('upload', ['model' => $model]);
-                        }
+                        $mahasiswa->sesi_id = $model->sesi_id;
+                        $mahasiswa->save(false); // langsung simpan tanpa validasi
                     }
-
-                    Yii::$app->session->setFlash('success', 'Data dari file Excel berhasil diimpor.');
-                    // Hapus file setelah diproses
-                    unlink($filePath);
-                    return $this->redirect(['index']); // Arahkan ke halaman index mahasiswa atau halaman lain
-
-                } catch (\Exception $e) {
-                    Yii::$app->session->setFlash('error', 'Terjadi kesalahan saat memproses file: ' . $e->getMessage());
                 }
+
+                Yii::$app->session->setFlash('success', 'Data berhasil diimport ke database.');
+                return $this->redirect(['index']);
             }
         }
 
-        return $this->render('upload', ['model' => $model]);
+        return $this->render('upload_excel', [
+            'uploadModel' => $model,
+        ]);
     }
+
+
+
     public function actionIndex()
     {
         $searchModel = new MahasiswaSearch();
@@ -109,62 +95,77 @@ class MahasiswaController extends Controller
         $model = new Mahasiswa();
         $uploadModel = new UploadExcelForm();
 
-        if ($this->request->isPost) {
-            // === Jika tombol submit berasal dari form manual ===
-            if (Yii::$app->request->post('Mahasiswa')) {
-                if ($model->load($this->request->post()) && $model->save()) {
-                    Yii::$app->session->setFlash('success', 'Data mahasiswa berhasil disimpan.');
-                    return $this->redirect(['index']);
-                }
-            }
-
-            // === Jika tombol submit berasal dari form upload Excel ===
-            if (Yii::$app->request->post('UploadExcelForm')) {
-                $uploadModel->excelFile = UploadedFile::getInstance($uploadModel, 'excelFile');
-
-                if ($uploadModel->excelFile && $uploadModel->upload()) {
-                    $filePath = 'uploads/' . $uploadModel->excelFile->baseName . '.' . $uploadModel->excelFile->extension;
-
-                    try {
-                        $spreadsheet = IOFactory::load($filePath);
-                        $worksheet = $spreadsheet->getActiveSheet();
-                        $highestRow = $worksheet->getHighestRow();
-
-                        // ambil sesi_id dari form Excel
-                        $sesi_id = Yii::$app->request->post('UploadExcelForm')['sesi_id'] ?? null;
-
-                        for ($row = 2; $row <= $highestRow; $row++) {
-                            $nim = $worksheet->getCell('A' . $row)->getValue();
-                            $semester = $worksheet->getCell('B' . $row)->getValue();
-                            if (empty($nim)) {
-                                continue;
-                            }
-                            $existingMahasiswa = Mahasiswa::findOne(['nim' => $nim]);
-                            if ($existingMahasiswa === null) {
-                                $mahasiswa = new Mahasiswa();
-                                $mahasiswa->nim = $nim;
-                                $mahasiswa->semester = $semester;
-                                $mahasiswa->sesi_id = $sesi_id;
-                                $mahasiswa->save(false);
-                            }
-                        }
-
-                        Yii::$app->session->setFlash('success', 'Data dari file Excel berhasil diimpor.');
-                        unlink($filePath);
-                        return $this->redirect(['index']);
-                    } catch (\Exception $e) {
-                        Yii::$app->session->setFlash('error', 'Terjadi kesalahan saat memproses file: ' . $e->getMessage());
-                    }
-                }
-            }
-        }
-
         return $this->render('create', [
             'model' => $model,
             'uploadModel' => $uploadModel,
         ]);
     }
 
+    public function actionCreateManual()
+    {
+        $model = new Mahasiswa();
+
+        if ($this->request->isPost && $model->load($this->request->post())) {
+            if ($model->save()) {
+                Yii::$app->session->setFlash('success', 'Data mahasiswa berhasil disimpan.');
+                return $this->redirect(['index']);
+            }
+        }
+
+        return $this->render('upload_manual', ['model' => $model]);
+    }
+
+
+
+
+    public function actionCreateExcel()
+    {
+        $uploadModel = new UploadExcelForm();
+
+        if (Yii::$app->request->isPost) {
+            $uploadModel->excelFile = UploadedFile::getInstance($uploadModel, 'excelFile');
+
+            if ($uploadModel->excelFile && $uploadModel->excelFile->extension === 'xlsx' && $uploadModel->upload()) {
+                $filePath = Yii::getAlias('@webroot/uploads/') . $uploadModel->excelFile->baseName . '.' . $uploadModel->excelFile->extension;
+
+                try {
+                    $spreadsheet = IOFactory::load($filePath);
+                    $worksheet = $spreadsheet->getActiveSheet();
+                    $highestRow = $worksheet->getHighestRow();
+
+                    $sesi_id = Yii::$app->request->post('UploadExcelForm')['sesi_id'] ?? null;
+
+                    for ($row = 2; $row <= $highestRow; $row++) {
+                        $nim = $worksheet->getCell('A' . $row)->getValue();
+                        $semester = $worksheet->getCell('B' . $row)->getValue();
+
+                        if (empty($nim)) {
+                            continue;
+                        }
+                        $existingMahasiswa = Mahasiswa::findOne(['nim' => $nim]);
+                        if ($existingMahasiswa === null) {
+                            $mahasiswa = new Mahasiswa();
+                            $mahasiswa->nim = $nim;
+                            $mahasiswa->semester = $semester;
+                            $mahasiswa->sesi_id = $sesi_id;
+                            $mahasiswa->save(false);
+                        }
+                    }
+                    Yii::$app->session->setFlash('success', 'Data dari file Excel berhasil diimpor.');
+                    @unlink($filePath);
+                    return $this->redirect(['index']);
+                } catch (\Exception $e) {
+                    Yii::$app->session->setFlash('error', 'Terjadi kesalahan saat memproses file: ' . $e->getMessage());
+                }
+            } else {
+                Yii::$app->session->setFlash('error', 'Hanya file .xlsx yang diperbolehkan.');
+            }
+        }
+
+        return $this->render('upload_excel', [
+            'uploadModel' => $uploadModel,
+        ]);
+    }
 
 
     public function actionUpdate($id)

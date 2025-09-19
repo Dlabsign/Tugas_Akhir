@@ -5,13 +5,8 @@ namespace app\models;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\web\IdentityInterface;
-
-
-
 class Pengguna extends \yii\db\ActiveRecord implements IdentityInterface
 {
-
-
     public $new_password;
     public $confirm_password;
     public static function tableName()
@@ -48,7 +43,6 @@ class Pengguna extends \yii\db\ActiveRecord implements IdentityInterface
         ];
     }
 
-
     public function scenarios()
     {
         $scenarios = parent::scenarios();
@@ -56,8 +50,6 @@ class Pengguna extends \yii\db\ActiveRecord implements IdentityInterface
         $scenarios['update'] = ['username', 'new_password', 'confirm_password', 'type', 'semester', 'lab', 'nim'];
         return $scenarios;
     }
-
-
     // Implementasi IdentityInterface
     public static function findIdentity($id)
     {
@@ -92,13 +84,17 @@ class Pengguna extends \yii\db\ActiveRecord implements IdentityInterface
     // Password
     public function setPassword($password)
     {
-        $this->password = Yii::$app->security->generatePasswordHash($password);
+        // langsung simpan plain text
+        $this->password = $password;
     }
+
 
     public function validatePassword($password)
     {
-        return Yii::$app->security->validatePassword($password, $this->password);
+        // langsung bandingkan string
+        return $this->password === $password;
     }
+
 
     public function getLaboratorium()
     {
@@ -132,15 +128,7 @@ class Pengguna extends \yii\db\ActiveRecord implements IdentityInterface
     {
         if (parent::beforeSave($insert)) {
             if ($this->isNewRecord) {
-                // Set flag = 1 saat insert
                 $this->flag = 1;
-            }
-
-            if ($this->isNewRecord || $this->isAttributeChanged('password')) {
-                // cek apakah password sudah di-hash
-                if (substr($this->password, 0, 4) !== '$2y$') {
-                    $this->password = Yii::$app->security->generatePasswordHash($this->password);
-                }
             }
             return true;
         }

@@ -19,8 +19,10 @@
         <h1><?= Html::encode($this->title) ?></h1>
 
         <p>
-            <?= Html::a('Create Mahasiswa', ['create'], ['class' => 'btn btn-success']) ?>
+            <?= Html::a('Tambah Manual', ['create-manual'], ['class' => 'btn btn-primary']) ?>
+            <?= Html::a('Import Excel', ['create-excel'], ['class' => 'btn btn-success']) ?>
         </p>
+
 
         <?php // echo $this->render('_search', ['model' => $searchModel]); 
         ?>
@@ -49,7 +51,7 @@
                     'value' => function ($model) {
                         return $model->sesi ? $model->sesi->sesi : '-';
                     },
-                    
+
                 ],
                 [
                     'label' => 'Mata Kuliah',
@@ -57,7 +59,7 @@
                     'value' => function ($model) {
                         return $model->matakuliah ? $model->matakuliah->nama : '-';
                     },
-                    
+
                 ],
                 'nilai',
                 [

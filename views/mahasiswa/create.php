@@ -14,9 +14,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <?= $this->render('_form', [
-        'model' => $model,
-        'uploadModel' => $uploadModel, // Kirimkan model upload ke _form
-    ]) ?>
+    <p>Silakan pilih metode untuk menambahkan data mahasiswa:</p>
+
+    <p>
+    </p>
 
 </div>

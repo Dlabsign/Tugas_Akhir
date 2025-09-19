@@ -17,10 +17,11 @@ class UploadExcelForm extends Model
     {
         return [
             [['sesi_id'], 'integer'],
-            [['excelFile','sesi_id'], 'required', 'message' => 'Silakan pilih file Excel.'],
-            [['excelFile'], 'file', 'skipOnEmpty' => false, 'extensions' => 'xls, xlsx', 'wrongExtension' => 'Hanya file dengan format .xls atau .xlsx yang diizinkan.'],
+            // [['excelFile', 'sesi_id'], 'required', 'message' => 'Silakan pilih file.'],
+            [['excelFile'], 'file', 'skipOnEmpty' => false, 'checkExtensionByMimeType' => false],
         ];
     }
+
 
     public function attributeLabels()
     {
