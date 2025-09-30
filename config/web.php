@@ -27,14 +27,18 @@ $config = [
         'user' => [
             'identityClass' => 'app\models\User',
             'enableAutoLogin' => true,
+            'identityCookie' => [
+                'name' => '_identity-main', // nama lain
+                'httpOnly' => true,
+            ],
             'loginUrl' => ['site/login'], // kalau belum login otomatis redirect ke sini
         ],
         'defaultRoute' => 'site/index', // route default setelah login
-
         'session' => [
             'timeout' => 3600, // 1 jam
-        ],
+            'name' => 'advanced-main', // nama lain
 
+        ],
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
@@ -44,7 +48,6 @@ $config = [
             // send all mails to a file by default.
             'useFileTransport' => true,
         ],
-
 
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
@@ -59,8 +62,7 @@ $config = [
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
-            'rules' => [
-            ],
+            'rules' => [],
         ],
     ],
     'params' => $params,

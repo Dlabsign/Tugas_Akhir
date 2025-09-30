@@ -14,17 +14,14 @@ use yii\widgets\ActiveForm;
     ]); ?>
 
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-6">
             <?= $form->field($model, 'nama')->textInput(['maxlength' => true])->label('Nama Mata Kuliah') ?>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
             <?= $form->field($model, 'semester')->textInput() ?>
         </div>
     </div>
-    <div class="form-group">
-        <?= Html::submitButton('Simpan', ['class' => 'btn btn-success', 'id' => 'btn-save']) ?>
-    </div>
-
+    <?= Html::submitButton('Simpan', ['class' => 'inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition duration-200 no-underline']) ?>
     <?php ActiveForm::end(); ?>
 </div>
 

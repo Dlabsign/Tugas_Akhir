@@ -1,32 +1,27 @@
 <?php
 
-use app\models\Matakuliah;
+use app\models\Pengerjaan;
 use yii\helpers\Html;
 use yii\helpers\Url;
-use yii\bootstrap5\Modal;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 
 /** @var yii\web\View $this */
-/** @var app\models\MatakulliahSearch $searchModel */
+/** @var app\models\PengerjaanSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
-$this->title = 'Mata Kuliah';
+$this->title = 'Penilaian';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="matakuliah-index">
+<div class="pengerjaan-index">
 
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-200 pb-6">
         <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-800 tracking-tight">
-            Buat <?= Html::encode($this->title) ?></h1>
+            <?= Html::encode($this->title) ?></h1>
         </h1>
-        <!-- Tombol buka modal create -->
-        <?= Html::button('Buat mATKUL', [
-            'class' => 'mt-4 md:mt-0 inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition duration-200',
-            'id' => 'modalButton'
-        ]) ?>
+
     </div>
-   
+
     <div class="card shadow-sm p-3">
 
         <?= GridView::widget([
@@ -36,8 +31,25 @@ $this->params['breadcrumbs'][] = $this->title;
             'options' => ['class' => ' shadow-sm p-0'], // Jika ingin tampilan dalam card
             'columns' => [
                 ['class' => 'yii\grid\SerialColumn'],
-                'nama',
-                'semester',
+
+                // 'id',
+                // 'soal_id',
+                'kode_soal',
+                [
+                    'label' => 'NIM Mahasiswa',
+                    'attribute' => 'mahasiswa_id',
+                    'value' => function ($model) {
+                        return $model->mahasiswa ? $model->mahasiswa->nim : '-';
+                    },
+
+                ],
+                // 'waktu_pengumpulan',
+                'jawaban_teks:ntext',
+
+                //'skor',
+                //'umpan_balik:ntext',
+                //'staff_check',
+                //'flag',
                 [
                     'class' => ActionColumn::className(),
                     'contentOptions' => ['style' => 'width: 180px; text-align: center; white-space: nowrap;'],
@@ -83,39 +95,3 @@ $this->params['breadcrumbs'][] = $this->title;
         ]); ?>
     </div>
 </div>
-
-<?php
-// Modal tunggal untuk create & update
-Modal::begin([
-    'title' => '<h5></h5>',
-    'id' => 'modalCreate',
-    'options' => ['tabindex' => false],
-]);
-echo "<div id='modalContent'></div>";
-Modal::end();
-
-// URL create
-$createUrl = Url::to(['create']);
-$createUrlJs = json_encode($createUrl);
-
-$script = <<<JS
-// CREATE
-$('#modalButton').on('click', function () {
-    $('#modalCreate .modal-title').text('Buat Ruangan Baru');
-    $('#modalCreate').modal('show')
-        .find('#modalContent')
-        .load({$createUrlJs});
-});
-
-// UPDATE
-$(document).on('click', '.modalUpdateBtn', function (e) {
-    e.preventDefault();
-    var url = $(this).data('url');
-    $('#modalCreate .modal-title').text('Ubah Ruangan');
-    $('#modalCreate').modal('show')
-        .find('#modalContent')
-        .load(url);
-});
-JS;
-
-$this->registerJs($script);

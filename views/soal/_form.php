@@ -7,6 +7,7 @@ use app\models\Jadwal;
 
 /** @var yii\web\View $this */
 /** @var yii\widgets\ActiveForm $form */
+$this->params['breadcrumbs'][] = $this->title;
 
 $jadwal = ArrayHelper::map(
     Jadwal::find()->where(['flag' => 1])->with(['matakuliah', 'laboratorium'])->all(),

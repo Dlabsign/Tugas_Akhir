@@ -88,7 +88,7 @@ class MatakuliahController extends Controller
             return $this->redirect(['index']);
         }
 
-        return $this->render('update', [
+        return $this->renderAjax('update', [
             'model' => $model,
         ]);
     }

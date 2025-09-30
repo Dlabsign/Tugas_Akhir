@@ -14,10 +14,11 @@ $matkul = ArrayHelper::map(Matakuliah::find()->where(['flag' => 1])->all(), 'id'
 
 <div class="jadwal-form">
     <?php $form = ActiveForm::begin([
-        'id' => 'jadwal-form',
+        'id' => 'laboratorium-form',
         'enableAjaxValidation' => false,
         'options' => ['onsubmit' => 'return false;'], // cegah submit default
     ]); ?>
+
     <div class="row">
         <div class="col-md-6">
             <?= $form->field($model, 'sesi')->label('Masukkan Sesi')->textInput() ?>
@@ -55,12 +56,8 @@ $matkul = ArrayHelper::map(Matakuliah::find()->where(['flag' => 1])->all(), 'id'
                     $matkul,
                 ); ?>
             </div>
+            <?= Html::submitButton('Simpan', ['class' => 'inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition duration-200 no-underline']) ?>
 
-
-            <div class="form-group">
-                <?= Html::submitButton('Simpan', ['class' => 'btn btn-success', 'id' => 'btn-save']) ?>
-
-            </div>
             <?php ActiveForm::end(); ?>
         </div>
     </div>

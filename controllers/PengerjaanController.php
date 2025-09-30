@@ -2,17 +2,16 @@
 
 namespace app\controllers;
 
-use app\models\Jadwal;
-use app\models\JadwalSearch;
-use Yii;
+use app\models\Pengerjaan;
+use app\models\PengerjaanSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * JadwalController implements the CRUD actions for Jadwal model.
+ * PengerjaanController implements the CRUD actions for Pengerjaan model.
  */
-class JadwalController extends Controller
+class PengerjaanController extends Controller
 {
     /**
      * @inheritDoc
@@ -33,13 +32,13 @@ class JadwalController extends Controller
     }
 
     /**
-     * Lists all Jadwal models.
+     * Lists all Pengerjaan models.
      *
      * @return string
      */
     public function actionIndex()
     {
-        $searchModel = new JadwalSearch();
+        $searchModel = new PengerjaanSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
         return $this->render('index', [
@@ -49,7 +48,7 @@ class JadwalController extends Controller
     }
 
     /**
-     * Displays a single Jadwal model.
+     * Displays a single Pengerjaan model.
      * @param int $id ID
      * @return string
      * @throws NotFoundHttpException if the model cannot be found
@@ -62,39 +61,34 @@ class JadwalController extends Controller
     }
 
     /**
-     * Creates a new Jadwal model.
+     * Creates a new Pengerjaan model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return string|\yii\web\Response
      */
     public function actionCreate()
     {
-        $model = new Jadwal();
-        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
-            Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            if ($model->validate()) {
-                $model->save(false);
-                return ['success' => true];
-            } else {
-                return [
-                    'success' => false,
-                    'errors' => $model->getErrors(),
-                ];
+        $model = new Pengerjaan();
+
+        if ($this->request->isPost) {
+            if ($model->load($this->request->post()) && $model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
             }
+        } else {
+            $model->loadDefaultValues();
         }
 
-        // if ($this->request->isPost) {
-        //     if ($model->load($this->request->post()) && $model->save()) {
-        //         return $this->redirect(['view', 'id' => $model->id]);
-        //     }
-        // } else {
-        //     $model->loadDefaultValues();
-        // }
-
-        return $this->renderAjax('_form', [
+        return $this->renderAjax('create', [
             'model' => $model,
         ]);
     }
 
+    /**
+     * Updates an existing Pengerjaan model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param int $id ID
+     * @return string|\yii\web\Response
+     * @throws NotFoundHttpException if the model cannot be found
+     */
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
@@ -109,7 +103,7 @@ class JadwalController extends Controller
     }
 
     /**
-     * Deletes an existing Jadwal model.
+     * Deletes an existing Pengerjaan model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param int $id ID
      * @return \yii\web\Response
@@ -123,15 +117,15 @@ class JadwalController extends Controller
     }
 
     /**
-     * Finds the Jadwal model based on its primary key value.
+     * Finds the Pengerjaan model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param int $id ID
-     * @return Jadwal the loaded model
+     * @return Pengerjaan the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Jadwal::findOne(['id' => $id])) !== null) {
+        if (($model = Pengerjaan::findOne(['id' => $id])) !== null) {
             return $model;
         }
 
