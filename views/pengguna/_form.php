@@ -58,7 +58,7 @@ use yii\widgets\ActiveForm;
     </div>
 
     <div class="form-group flex items-center gap-3">
-        <?= Html::a('Kembali', ['index'], ['class' => 'inline-block bg-gray-700 hover:bg-gray-500 text-gray-200 font-semibold py-3 px-6 rounded-lg transition duration-150']) ?>
+        <?= Html::a('Kembali', ['index'], ['class' => 'inline-block bg-gray-700 hover:bg-gray-500 text-gray-200 font-semibold py-3 px-6 rounded-lg transition duration-150 underline underline-offset-1']) ?>
         <?= Html::submitButton('Simpan', ['class' => 'inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition duration-200 no-underline']) ?>
     </div>
 

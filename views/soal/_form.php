@@ -32,9 +32,6 @@ $jadwal = ArrayHelper::map(
         2 => 'C++',
     ]) ?>
 
-
-
-
     <!-- Container soal -->
     <div id="soal-container">
         <div class="soal-item border p-3 mb-3">

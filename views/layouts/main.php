@@ -60,10 +60,13 @@ if ($user) {
 
 <head>
     <title><?= Html::encode($this->title) ?></title>
-    <?php $this->head() ?>
+    <?php
+    $this->registerCssFile('@web/css/output.css', ['depends' => [\yii\web\YiiAsset::class]]);
+    $this->head();
+    ?>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link href="/tugas-akhir/web/css/output.css" rel="stylesheet">
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script> -->
+  <script src="https://cdn.tailwindcss.com"></script>
 
 
     <style>

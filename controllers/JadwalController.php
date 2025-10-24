@@ -100,13 +100,58 @@ class JadwalController extends Controller
     //     ]);
     // }
 
+    // public function actionCreate()
+    // {
+    //     $model = new Jadwal();
+
+    //     if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+    //         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+    //         if ($model->validate()) {
+    //             $model->flag = 1;
+    //             $model->save(false);
+    //             return ['success' => true];
+    //         } else {
+    //             return ['success' => false, 'errors' => $model->getErrors()];
+    //         }
+    //     }
+
+    //     return $this->renderAjax('_form', ['model' => $model]);
+    // }
+
+
     public function actionCreate()
     {
         $model = new Jadwal();
 
         if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
             Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
             if ($model->validate()) {
+                // Pengecekan jadwal bentrok (hanya jadwal aktif dengan flag = 1)
+                $conflict = Jadwal::find()
+                    ->where([
+                        'tanggal_jadwal' => $model->tanggal_jadwal,
+                        'laboratorium_id' => $model->laboratorium_id,
+                        'flag' => 1
+                    ])
+                    ->andWhere([
+                        'or',
+                        // Waktu mulai berada di tengah jadwal lain
+                        ['between', 'waktu_mulai', $model->waktu_mulai, $model->waktu_selesai],
+                        // Waktu selesai berada di tengah jadwal lain
+                        ['between', 'waktu_selesai', $model->waktu_mulai, $model->waktu_selesai],
+                        // Jadwal lain menutupi seluruh rentang waktu
+                        ['and', ['<=', 'waktu_mulai', $model->waktu_mulai], ['>=', 'waktu_selesai', $model->waktu_selesai]]
+                    ])
+                    ->exists();
+
+                if ($conflict) {
+                    return [
+                        'success' => false,
+                        'errors' => ['jadwal' => ['Jadwal bentrok dengan jadwal lain di laboratorium yang sama.']]
+                    ];
+                }
+
                 $model->flag = 1;
                 $model->save(false);
                 return ['success' => true];
@@ -117,6 +162,7 @@ class JadwalController extends Controller
 
         return $this->renderAjax('_form', ['model' => $model]);
     }
+
 
 
     public function actionUpdate($id)

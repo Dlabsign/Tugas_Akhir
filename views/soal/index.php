@@ -69,7 +69,7 @@ foreach ($dataProvider->getModels() as $soal) {
             ['create'],
             [
                 'class' =>
-                'mt-4 md:mt-0 inline-block inline bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition duration-200 no-underline'
+                'mt-4 md:mt-0 inline-block inline bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition duration-200'
             ]
         ) ?>
     </div>
