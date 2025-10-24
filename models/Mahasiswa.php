@@ -4,17 +4,6 @@ namespace app\models;
 
 use Yii;
 
-/**
- * This is the model class for table "mahasiswa".
- *
- * @property int $id
- * @property int $nim
- * @property int $semester
- * @property int $sesi_id
- * @property int $flag
- *
- * @property Jadwal $sesi
- */
 class Mahasiswa extends \yii\db\ActiveRecord
 {
     public static function tableName()
@@ -25,7 +14,8 @@ class Mahasiswa extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['nim', 'semester', 'sesi_id', 'flag'], 'integer'],
+            [['nim', 'semester', 'kode_soal', 'sesi_id', 'flag'], 'integer'],
+            [['nilai_sikap', 'nilai_kedisiplinan', 'nilai_akhir'], 'number'],
         ];
     }
 
@@ -34,6 +24,10 @@ class Mahasiswa extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'nim' => 'NIM',
+            'kode_soal' => 'Kode Soal',
+            'semester' => 'Semester',
+            'nilai_sikap' => 'Nilai Sikap',
+            'nilai_kedisiplinan' => 'Nilai Disiplin',
             'semester' => 'Semester',
             'sesi_id' => 'Sesi',
             'flag' => 'Flag',
@@ -62,4 +56,14 @@ class Mahasiswa extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Matakuliah::class, ['id' => 'matakuliah_id'])->via('sesi');
     }
+
+    public function getPengerjaan()
+    {
+        return $this->hasOne(Pengerjaan::class, ['mahasiswa_id' => 'id']);
+    }
+
+    // public function getLaboratorium()
+    // {
+    //     return $this->hasOne(Laboratorium::class, ['id' => 'laboratorium_id']);
+    // }
 }

@@ -13,7 +13,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <!-- Header -->
     <div class="flex items-center justify-between mb-6">
         <h2 class="text-2xl font-bold text-gray-800">
-            📘 Soal dengan Kode: <span class="text-indigo-600"><?= Html::encode($kode_soal) ?></span>
+            Kode Soal: <span class="text-indigo-600"><?= Html::encode($kode_soal) ?></span>
         </h2>
     </div>
 
@@ -26,8 +26,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     <tr>
                         <th class="border border-gray-300 px-4 py-3 text-left">#</th>
                         <th class="border border-gray-300 px-4 py-3 text-left">Teks Soal</th>
-                        <th class="border border-gray-300 px-4 py-3 text-center">Skor Maks</th>
-                        <th class="border border-gray-300 px-4 py-3 text-center">Jam</th>
                         <th class="border border-gray-300 px-4 py-3 text-center">Aksi</th>
                     </tr>
                 </thead>
@@ -45,17 +43,9 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <?= Html::encode($soal['teks_soal']) ?>
                             </td>
 
-                            <!-- Skor -->
-                            <td class="border border-gray-300 px-4 py-2 text-center">
-                                <span class="px-3 py-1 bg-indigo-100  text-indigo-700 rounded-full text-sm font-semibold">
-                                    <?= Html::encode($soal['skor_maks']) ?>
-                                </span>
-                            </td>
+                           
 
-                            <!-- Jam (ambil dari created_at / updated_at kalau ada) -->
-                            <td class="border border-gray-300 px-4 py-2 text-center text-sm text-gray-500">
-                                <?= isset($soal['created_at']) ? date('H:i', strtotime($soal['created_at'])) : '-' ?>
-                            </td>
+                         
 
                             <!-- Aksi -->
                             <td class="border border-gray-300 px-4 py-2  textgra space-x-2">

@@ -2,7 +2,10 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use yii\helpers\Url;
 
+/** @var yii\web\View $this */
+/** @var app\models\Matakuliah $model */
 ?>
 
 <div class="matakuliah-form">
@@ -10,8 +13,9 @@ use yii\widgets\ActiveForm;
     <?php $form = ActiveForm::begin([
         'id' => 'matakuliah-form',
         'enableAjaxValidation' => false,
-        'options' => ['onsubmit' => 'return false;'], // cegah submit default
     ]); ?>
+
+    <?= $form->field($model, 'id')->hiddenInput()->label(false) ?>
 
     <div class="row">
         <div class="col-md-6">
@@ -21,31 +25,46 @@ use yii\widgets\ActiveForm;
             <?= $form->field($model, 'semester')->textInput() ?>
         </div>
     </div>
-    <?= Html::submitButton('Simpan', ['class' => 'inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition duration-200 no-underline']) ?>
+
+    <?= Html::button(
+        $model->isNewRecord ? 'Simpan' : 'Perbarui',
+        ['id' => 'btn-save', 'class' => 'btn btn-primary w-100 mt-3']
+    ) ?>
+
     <?php ActiveForm::end(); ?>
 </div>
 
-
 <?php
-$createUrl = \yii\helpers\Url::to(['matakuliah/create']);
+$createUrl = Url::to(['matakuliah/create']);
+$updateUrl = Url::to(['matakuliah/update']);
+
 $js = <<<JS
-$('#btn-save').on('click', function(e) {
+$('#btn-save').off('click').on('click', function(e) {
     e.preventDefault();
+
     var form = $('#matakuliah-form');
+    var id = form.find('#matakuliah-id').val();
+    var url = id ? '$updateUrl?id=' + id : '$createUrl';
+
     $.ajax({
-        url: '$createUrl',
+        url: url,
         type: 'POST',
         data: form.serialize(),
         success: function(res) {
             if (res.success) {
-                alert('Data berhasil disimpan!');
-                location.reload();
-            } else {
-                if (res.errors && res.errors.nama) {
-                    alert(res.errors.nama[0]);
+                // Tutup modal langsung tanpa alert
+                $('#modalCreate').modal('hide');
+                // Refresh GridView (jika pakai Pjax)
+                if ($.pjax) {
+                    $.pjax.reload({container: '#w0-pjax'});
                 } else {
-                    alert('Gagal menyimpan data!');
+                    // Kalau gak pakai Pjax, reload full page
+                    location.reload();
                 }
+            } else if (res.errors) {
+                // Render ulang form kalau ada error
+                let msg = Object.values(res.errors).map(err => err[0]).join('\\n');
+                alert('Gagal menyimpan data:\\n' + msg);
             }
         },
         error: function() {
@@ -54,5 +73,6 @@ $('#btn-save').on('click', function(e) {
     });
 });
 JS;
+
 $this->registerJs($js);
 ?>

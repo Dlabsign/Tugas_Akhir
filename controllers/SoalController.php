@@ -7,6 +7,7 @@ use app\models\Detail_soalSearch;
 use app\models\SoalSearch;
 use Yii;
 use yii\base\Model;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -21,17 +22,24 @@ class SoalController extends Controller
      */
     public function behaviors()
     {
-        return array_merge(
-            parent::behaviors(),
-            [
-                'verbs' => [
-                    'class' => VerbFilter::className(),
-                    'actions' => [
-                        'delete' => ['POST'],
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'only' => ['index', 'view', 'create', 'update', 'delete'], // aksi yang dibatasi
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'], // hanya pengguna login
                     ],
                 ],
-            ]
-        );
+            ],
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => [
+                    'delete' => ['POST'],
+                ],
+            ],
+        ];
     }
 
     /**
@@ -134,6 +142,8 @@ class SoalController extends Controller
                     $model->attributes = $data;
                     $model->sesi_id = $post['Detail_soal']['sesi_id'] ?? null;
                     $model->kode_soal = $post['Detail_soal']['kode_soal'] ?? null;
+                    // $model->kode_soal = $post['Detail_soal']['kode_soal'] ?? null;
+                    $model->bahasa = $post['Detail_soal']['bahasa'] ?? null;
                     if ($model->sesi_id) {
                         $jadwal = \app\models\Jadwal::findOne($model->sesi_id);
                         if ($jadwal) {
@@ -157,7 +167,7 @@ class SoalController extends Controller
     public function actionViewByKode($kode_soal)
     {
         $soalList = (new \yii\db\Query())
-            ->select(['id', 'kode_soal', 'teks_soal', 'skor_maks'])
+            ->select(['id', 'kode_soal', 'teks_soal'])
             ->from('detail_soal')   // pakai tabel detail_soal
             ->where(['kode_soal' => $kode_soal])
             ->all();
@@ -182,21 +192,116 @@ class SoalController extends Controller
     }
 
 
-   
-    public function actionUpdate($id)
-    {
-        $modelUtama = $this->findModel($id);
-       
-        // ambil semua soal terkait kode_soal
-        $modelsSoal = Detail_soal::find()
-            ->where(['kode_soal' => $modelUtama->kode_soal])
-            ->all();
 
-        if (Yii::$app->request->isPost) {
-            $post = Yii::$app->request->post();
+    // public function actionUpdate($id)
+    // {
+    //     $modelUtama = $this->findModel($id);
+
+    //     // ambil semua soal terkait kode_soal
+    //     $modelsSoal = Detail_soal::find()
+    //         ->where(['kode_soal' => $modelUtama->kode_soal])
+    //         ->all();
+
+    //     if (Yii::$app->request->isPost) {
+    //         $post = Yii::$app->request->post();
+
+    //         if (!empty($post['Detail_soal']) && is_array($post['Detail_soal'])) {
+    //             $sentIds = []; // untuk track id yang dikirim (untuk hapus sisanya)
+
+    //             foreach ($post['Detail_soal'] as $key => $data) {
+    //                 if (!is_numeric($key) || !is_array($data)) {
+    //                     continue;
+    //                 }
+
+    //                 $teks = trim($data['teks_soal'] ?? '');
+    //                 // $skor = trim((string)($data['skor_maks'] ?? ''));
+    //                 if ($teks === '') {
+    //                     continue;
+    //                 }
+
+    //                 if (!empty($data['id'])) {
+    //                     // UPDATE
+    //                     $model = Detail_soal::findOne($data['id']);
+    //                     if ($model) {
+    //                         $model->load(['Detail_soal' => $data]);
+    //                         if (empty($model->sesi_id)) {
+    //                             $model->sesi_id = $post['Detail_soal'][0]['sesi_id'] ?? $modelUtama->sesi_id;
+    //                         }
+    //                         if (empty($model->kode_soal)) {
+    //                             $model->kode_soal = $modelUtama->kode_soal;
+    //                         }
+    //                         if (empty($model->bahasa)) {
+    //                             $model->bahasa = $modelUtama->bahasa;
+    //                         }
+    //                         if ($model->sesi_id) {
+    //                             $jadwal = \app\models\Jadwal::findOne($model->sesi_id);
+    //                             if ($jadwal) {
+    //                                 $model->matakuliah_id = $jadwal->matakuliah_id;
+    //                             }
+    //                         }
+    //                         $model->save(false);
+    //                         $sentIds[] = (int)$model->id;
+    //                     }
+    //                 } else {
+    //                     // CREATE BARU
+    //                     $model = new Detail_soal();
+    //                     $model->load(['Detail_soal' => $data]);
+    //                     $model->sesi_id = $data['sesi_id'] ?? ($post['Detail_soal'][0]['sesi_id'] ?? $modelUtama->sesi_id);
+    //                     $model->kode_soal = $data['kode_soal'] ?? $modelUtama->kode_soal;
+    //                     $model->bahasa = $data['bahasa'] ?? $modelUtama->bahasa;
+    //                     if ($model->sesi_id) {
+    //                         $jadwal = \app\models\Jadwal::findOne($model->sesi_id);
+    //                         if ($jadwal) {
+    //                             $model->matakuliah_id = $jadwal->matakuliah_id;
+    //                         }
+    //                     }
+    //                     $model->save(false);
+    //                     $sentIds[] = (int)$model->id;
+    //                 }
+    //             }
+
+    //             // DELETE yang dihapus dari UI
+    //             if (!empty($sentIds)) {
+    //                 Detail_soal::deleteAll([
+    //                     'and',
+    //                     ['kode_soal' => $modelUtama->kode_soal],
+    //                     ['not in', 'id', $sentIds]
+    //                 ]);
+    //             } else {
+    //                 Detail_soal::deleteAll(['kode_soal' => $modelUtama->kode_soal]);
+    //             }
+
+    //             return $this->redirect(['view-by-kode', 'kode_soal' => $modelUtama->kode_soal]);
+    //         }
+    //     }
+
+    //     return $this->render('update', [
+    //         'modelsSoal' => $modelsSoal,
+    //         'modelUtama' => $modelUtama,
+    //     ]);
+    // }
+
+public function actionUpdate($id)
+{
+    $modelUtama = $this->findModel($id);
+
+    // ambil semua soal terkait kode_soal
+    $modelsSoal = Detail_soal::find()
+        ->where(['kode_soal' => $modelUtama->kode_soal])
+        ->all();
+
+    if (Yii::$app->request->isPost) {
+        $post = Yii::$app->request->post();
+
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            // update data utama
+            if ($modelUtama->load($post)) {
+                $modelUtama->save(false);
+            }
 
             if (!empty($post['Detail_soal']) && is_array($post['Detail_soal'])) {
-                $sentIds = []; // untuk track id yang dikirim (untuk hapus sisanya)
+                $sentIds = [];
 
                 foreach ($post['Detail_soal'] as $key => $data) {
                     if (!is_numeric($key) || !is_array($data)) {
@@ -204,69 +309,79 @@ class SoalController extends Controller
                     }
 
                     $teks = trim($data['teks_soal'] ?? '');
-                    $skor = trim((string)($data['skor_maks'] ?? ''));
-                    if ($teks === '' && $skor === '') {
+                    if ($teks === '') {
                         continue;
                     }
 
+                    // UPDATE
                     if (!empty($data['id'])) {
-                        // UPDATE
                         $model = Detail_soal::findOne($data['id']);
                         if ($model) {
                             $model->load(['Detail_soal' => $data]);
-                            if (empty($model->sesi_id)) {
-                                $model->sesi_id = $post['Detail_soal'][0]['sesi_id'] ?? $modelUtama->sesi_id;
-                            }
-                            if (empty($model->kode_soal)) {
-                                $model->kode_soal = $modelUtama->kode_soal;
-                            }
+
+                            // fallback jika ada field kosong
+                            $model->sesi_id = $model->sesi_id ?: ($post['Detail_soal'][0]['sesi_id'] ?? $modelUtama->sesi_id);
+                            $model->kode_soal = $model->kode_soal ?: $modelUtama->kode_soal;
+                            $model->bahasa = $model->bahasa ?: $modelUtama->bahasa;
+
                             if ($model->sesi_id) {
                                 $jadwal = \app\models\Jadwal::findOne($model->sesi_id);
                                 if ($jadwal) {
                                     $model->matakuliah_id = $jadwal->matakuliah_id;
                                 }
                             }
+
                             $model->save(false);
-                            $sentIds[] = (int)$model->id;
+                            $sentIds[] = (int) $model->id;
                         }
-                    } else {
-                        // CREATE BARU
+                    } 
+                    // CREATE BARU
+                    else {
                         $model = new Detail_soal();
                         $model->load(['Detail_soal' => $data]);
+
                         $model->sesi_id = $data['sesi_id'] ?? ($post['Detail_soal'][0]['sesi_id'] ?? $modelUtama->sesi_id);
                         $model->kode_soal = $data['kode_soal'] ?? $modelUtama->kode_soal;
+                        $model->bahasa = $data['bahasa'] ?? $modelUtama->bahasa;
+
                         if ($model->sesi_id) {
                             $jadwal = \app\models\Jadwal::findOne($model->sesi_id);
                             if ($jadwal) {
                                 $model->matakuliah_id = $jadwal->matakuliah_id;
                             }
                         }
+
                         $model->save(false);
-                        $sentIds[] = (int)$model->id;
+                        $sentIds[] = (int) $model->id;
                     }
                 }
 
-                // DELETE yang dihapus dari UI
+                // DELETE data yang dihapus dari UI
                 if (!empty($sentIds)) {
                     Detail_soal::deleteAll([
                         'and',
                         ['kode_soal' => $modelUtama->kode_soal],
-                        ['not in', 'id', $sentIds]
+                        ['not in', 'id', $sentIds],
                     ]);
                 } else {
                     Detail_soal::deleteAll(['kode_soal' => $modelUtama->kode_soal]);
                 }
-
-                return $this->redirect(['view-by-kode', 'kode_soal' => $modelUtama->kode_soal]);
             }
-        }
 
-        return $this->render('update', [
-            'modelsSoal' => $modelsSoal,
-            'modelUtama' => $modelUtama,
-        ]);
+            $transaction->commit();
+
+            return $this->redirect(['view-by-kode', 'kode_soal' => $modelUtama->kode_soal]);
+        } catch (\Exception $e) {
+            $transaction->rollBack();
+            throw $e;
+        }
     }
 
+    return $this->render('update', [
+        'modelsSoal' => $modelsSoal,
+        'modelUtama' => $modelUtama,
+    ]);
+}
 
 
     public function actionDelete($id)

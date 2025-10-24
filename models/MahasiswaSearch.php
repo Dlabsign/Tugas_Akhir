@@ -17,7 +17,7 @@ class MahasiswaSearch extends Mahasiswa
     public function rules()
     {
         return [
-            [['id', 'nim', 'semester', 'sesi_id', 'nilai', 'nilai_akhir', 'absensi', 'flag'], 'integer'],
+            [['id', 'nim', 'semester', 'sesi_id', 'nilai_sikap','nilai_kedisiplinan', 'nilai_akhir',  'flag'], 'integer'],
         ];
     }
 
@@ -62,9 +62,9 @@ class MahasiswaSearch extends Mahasiswa
             'nim' => $this->nim,
             'semester' => $this->semester,
             'sesi_id' => $this->sesi_id,
-            'nilai' => $this->nilai,
+            'nilai_sikap' => $this->nilai_sikap,
+            'nilai_kedisiplinan' => $this->nilai_kedisiplinan,
             'nilai_akhir' => $this->nilai_akhir,
-            'absensi' => $this->absensi,
             'flag' => $this->flag,
         ]);
 

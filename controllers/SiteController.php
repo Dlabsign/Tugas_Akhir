@@ -61,11 +61,6 @@ class SiteController extends Controller
         ];
     }
 
-
-
-    /**
-     * {@inheritdoc}
-     */
     public function actions()
     {
         return [
@@ -138,11 +133,11 @@ class SiteController extends Controller
             // Redirect sesuai role
             switch ($user->type) {
                 case 1:
-                    return $this->redirect(['dashboard/superadmin']);
+                    return $this->redirect(['dashboard/index']);
                 case 2:
-                    return $this->redirect(['dashboard/kepala']);
+                    return $this->redirect(['dashboard/index']);
                 case 3:
-                    return $this->redirect(['dashboard/asisten']);
+                    return $this->redirect(['dashboard/index']);
                 default:
                     return $this->goHome(); // Mahasiswa
             }
@@ -152,8 +147,6 @@ class SiteController extends Controller
             'model' => $model,
         ]);
     }
-
-
 
     /**
      * Logout action.

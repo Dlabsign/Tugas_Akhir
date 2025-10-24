@@ -26,32 +26,52 @@ $jadwal = ArrayHelper::map(
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <!-- header: sesi_id dan kode_soal -->
+    <!-- Header: sesi_id dan kode_soal -->
     <?= $form->field($modelUtama, "sesi_id")
-        ->dropDownList($jadwal, ['prompt' => 'Pilih Jadwal', 'id' => 'sesi-id']) ?>
+        ->dropDownList($jadwal, ['prompt' => 'Pilih Jadwal', 'id' => 'sesi-id', 'disabled' => true]) ?>
 
     <?= $form->field($modelUtama, "kode_soal")
-        ->textInput(['maxlength' => true, 'id' => 'kode-soal']) ?>
+        ->textInput(['maxlength' => true, 'id' => 'kode-soal', 'disabled' => true]) ?>
+
+    <?= $form->field($modelUtama, 'bahasa')->radioList(
+        [
+            1 => 'Mysql',
+            2 => 'C++',
+        ],
+        ['id' => 'bahasa']
+    ) ?>
+
 
     <div id="soal-container">
         <?php foreach ($modelsSoal as $i => $soal): ?>
             <div class="soal-item border p-3 mb-3">
                 <input type="hidden" name="Detail_soal[<?= $i ?>][id]" value="<?= $soal->id ?>">
+
+                <!-- Pilihan tipe soal -->
+                <div class="form-group">
+                    <label>Tipe Soal:</label><br>
+                    <label>
+                        <input type="radio" name="Detail_soal[<?= $i ?>][type]" value="1" <?= $soal->type == 1 ? 'checked' : '' ?>> Kode
+                    </label>
+                    &nbsp;&nbsp;
+                    <label>
+                        <input type="radio" name="Detail_soal[<?= $i ?>][type]" value="2" <?= $soal->type == 2 ? 'checked' : '' ?>> Isian
+                    </label>
+                </div>
+
+                <!-- Teks soal -->
                 <div class="form-group">
                     <label>Teks Soal</label>
-                    <textarea name="Detail_soal[<?= $i ?>][teks_soal]" class="form-control" rows="3" required><?= $soal->teks_soal ?></textarea>
+                    <textarea name="Detail_soal[<?= $i ?>][teks_soal]" class="form-control" rows="3" required><?= Html::encode($soal->teks_soal) ?></textarea>
                 </div>
-                <div class="form-group">
-                    <label>Skor Maks</label>
-                    <input type="number" step="0.01" name="Detail_soal[<?= $i ?>][skor_maks]" class="form-control" required value="<?= $soal->skor_maks ?>">
-                </div>
+
                 <input type="hidden" name="Detail_soal[<?= $i ?>][sesi_id]" value="<?= $soal->sesi_id ?>">
                 <input type="hidden" name="Detail_soal[<?= $i ?>][kode_soal]" value="<?= $soal->kode_soal ?>">
+
                 <button type="button" class="btn btn-danger btn-sm remove-soal">Hapus</button>
             </div>
         <?php endforeach; ?>
     </div>
-
 
     <button type="button" id="add-soal" class="btn btn-success">Tambah Soal</button>
     <br><br>
@@ -76,7 +96,7 @@ function getHeaderKode() {
     return $('#kode-soal').val() || '';
 }
 
-// tambah soal
+// Tambah soal baru
 $('#add-soal').on('click', function() {
     let sesiVal = getHeaderSesi();
     let kodeVal = getHeaderKode();
@@ -84,24 +104,33 @@ $('#add-soal').on('click', function() {
     let newItem = `
         <div class="soal-item border p-3 mb-3">
             <input type="hidden" name="Detail_soal[${index}][id]" value="">
+
+            <div class="form-group">
+                <label>Tipe Soal:</label><br>
+                <label>
+                    <input type="radio" name="Detail_soal[${index}][type]" value="1" checked> Kode
+                </label>
+                &nbsp;&nbsp;
+                <label>
+                    <input type="radio" name="Detail_soal[${index}][type]" value="2"> Isian
+                </label>
+            </div>
+
             <div class="form-group">
                 <label>Teks Soal</label>
                 <textarea name="Detail_soal[${index}][teks_soal]" class="form-control" rows="3" required></textarea>
             </div>
-            <div class="form-group">
-                <label>Skor Maks</label>
-                <input type="number" step="0.01" name="Detail_soal[${index}][skor_maks]" class="form-control" required>
-            </div>
+
             <input type="hidden" name="Detail_soal[${index}][sesi_id]" value="${sesiVal}">
             <input type="hidden" name="Detail_soal[${index}][kode_soal]" value="${kodeVal}">
             <button type="button" class="btn btn-danger btn-sm remove-soal">Hapus</button>
         </div>
     `;
     $('#soal-container').append(newItem);
-    index++; // counter selalu naik
+    index++;
 });
 
-// hapus soal
+// Hapus soal
 $(document).on('click', '.remove-soal', function() {
     $(this).closest('.soal-item').remove();
 });
@@ -109,28 +138,3 @@ JS;
 
 $this->registerJs($script);
 ?>
-
-
-
-
-<!-- // $script = <<<'JS'
-// let index = $('#soal-container .soal-item').length;
-
-// let newItem = `
-//     <div class="soal-item border p-3 mb-3">
-//         <input type="hidden" name="Detail_soal[${index}][id]" value="">
-//         <div class="form-group">
-//             <label>Teks Soal</label>
-//             <textarea name="Detail_soal[${index}][teks_soal]" class="form-control" rows="3" required></textarea>
-//         </div>
-//         <div class="form-group">
-//             <label>Skor Maks</label>
-//             <input type="number" step="0.01" name="Detail_soal[${index}][skor_maks]" class="form-control" required>
-//         </div>
-//         <input type="hidden" name="Detail_soal[${index}][sesi_id]" value="${sesiVal}">
-//         <input type="hidden" name="Detail_soal[${index}][kode_soal]" value="${kodeVal}">
-//         <button type="button" class="btn btn-danger btn-sm remove-soal">Hapus</button>
-//     </div>
-// `;
-// $('#soal-container').append(newItem);
-// JS; -->

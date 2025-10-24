@@ -18,7 +18,7 @@ class Detail_soalSearch extends Detail_soal
     {
         return [
             [['id', 'sesi_id', 'matakuliah_id', 'bobot_soal', 'flag'], 'integer'],
-            [['kode_soal', 'teks_soal', 'nama_file', 'data'], 'safe'],
+            [['kode_soal', 'teks_soal', 'type', 'bahasa', 'data'], 'safe'],
             [['skor_maks'], 'number'],
         ];
     }
@@ -70,7 +70,8 @@ class Detail_soalSearch extends Detail_soal
 
         $query->andFilterWhere(['like', 'kode_soal', $this->kode_soal])
             ->andFilterWhere(['like', 'teks_soal', $this->teks_soal])
-            ->andFilterWhere(['like', 'nama_file', $this->nama_file])
+            ->andFilterWhere(['like', 'type', $this->type])
+            ->andFilterWhere(['like', 'bahasa', $this->bahasa])
             ->andFilterWhere(['like', 'data', $this->data]);
 
         return $dataProvider;

@@ -3,13 +3,11 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\data\ActiveDataProvider;
-use app\models\Soal;
-use app\models\Jadwal;
-use app\models\Matakuliah;
 
 /** @var yii\web\View $this */
 /** @var app\models\SoalSearch $searchModel */
 /** @var ActiveDataProvider $dataProvider */
+$this->title = 'Detail Soal';
 
 $this->params['breadcrumbs'][] = $this->title;
 $groupedSoal = [];
@@ -61,10 +59,7 @@ foreach ($dataProvider->getModels() as $soal) {
         background-color: #fafafa;
     }
 </style>
-
-<div class="soal-index min-h-sceen px-4 sm:px-6 md:px-12 lg:px-20  ">
-
-    <!-- Header -->
+<div class="mahasiswa-index">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-200 pb-6">
         <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-800 tracking-tight">
             Buat Soal Mata Kuliah
@@ -113,7 +108,7 @@ foreach ($dataProvider->getModels() as $soal) {
                                 <?php
                                 $buttonText = '(Sesi ' . Html::encode(str_replace('_', ' ', $session['sesi_nama'])) . ') | '
                                     . Html::encode($session['waktu_display'])
-                                    . ' | Kode: ' . Html::encode($soalKode['kode_soal']);
+                                    . ' | Kode Soal: ' . Html::encode($soalKode['kode_soal']);
 
                                 // link ke detail berdasarkan kode_soal
                                 $link = Url::to(['view-by-kode', 'kode_soal' => $soalKode['kode_soal']]);
@@ -122,7 +117,8 @@ foreach ($dataProvider->getModels() as $soal) {
                                     $buttonText,
                                     $link,
                                     [
-                                        'class' => 'block w-full text-center bg-gray-200 hover:bg-gray-700 hover:text-gray-100 text-gray-800 px-5 py-3 rounded-lg font-bold shadow-sm transition no-underline'
+                                        'class' => 'block w-full text-center bg-gray-200 hover:bg-gray-300 px-5 py-3 rounded-lg font-bold shadow-sm transition no-underline text-gray-700',
+                                        'style' => 'text-decoration: none; color: black;',
                                     ]
                                 ) ?>
                             <?php endforeach; ?>

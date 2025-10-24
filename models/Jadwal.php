@@ -8,25 +8,20 @@ use yii\db\Expression;
 
 class Jadwal extends \yii\db\ActiveRecord
 {
-
     public static function tableName()
     {
         return 'jadwal';
     }
-
     public function rules()
     {
         return [
             [['flag'], 'default', 'value' => null],
-            [['laboratorium_id', 'tanggal_jadwal', 'waktu_mulai', 'waktu_selesai', 'dibuat_oleh_staff_id','sesi'], 'required'],
+            [['laboratorium_id', 'tanggal_jadwal', 'waktu_mulai', 'waktu_selesai', 'dibuat_oleh_staff_id', 'sesi'], 'required'],
             [['laboratorium_id', 'dibuat_oleh_staff_id', 'flag', 'sesi', 'matakuliah_id'], 'integer'],
             [['tanggal_jadwal', 'waktu_mulai', 'waktu_selesai', 'created_at'], 'safe'],
+
         ];
     }
-
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [
@@ -42,13 +37,11 @@ class Jadwal extends \yii\db\ActiveRecord
             'created_at' => 'Created At',
         ];
     }
-
     public function delete()
     {
         $this->flag = 0;
         return $this->save(false, ['flag']);
     }
-
 
     public function beforeSave($insert)
     {
@@ -60,8 +53,6 @@ class Jadwal extends \yii\db\ActiveRecord
         }
         return false;
     }
-
-
     public function getLaboratorium()
     {
         return $this->hasOne(Laboratorium::class, ['id' => 'laboratorium_id']);
@@ -71,7 +62,6 @@ class Jadwal extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Pengguna::class, ['id' => 'dibuat_oleh_staff_id']);
     }
-
     public function getMatakuliah()
     {
         return $this->hasOne(Matakuliah::class, ['id' => 'matakuliah_id'])->where(['flag' => 1]);

@@ -13,7 +13,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <div class="laboratorium-index">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-200 pb-6">
-        <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-800 tracking-tight">
+        <h1 class="text-3xl sm:text-4xl font-extrabold  tracking-tight">
             Ruang <?= Html::encode($this->title) ?>
         </h1>
 

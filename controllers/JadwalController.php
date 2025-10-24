@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\Jadwal;
 use app\models\JadwalSearch;
 use Yii;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -19,18 +20,26 @@ class JadwalController extends Controller
      */
     public function behaviors()
     {
-        return array_merge(
-            parent::behaviors(),
-            [
-                'verbs' => [
-                    'class' => VerbFilter::className(),
-                    'actions' => [
-                        'delete' => ['POST'],
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'only' => ['index', 'view', 'create', 'update', 'delete'], // aksi yang dibatasi
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'], // hanya pengguna login
                     ],
                 ],
-            ]
-        );
+            ],
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => [
+                    'delete' => ['POST'],
+                ],
+            ],
+        ];
     }
+
 
     /**
      * Lists all Jadwal models.
@@ -61,52 +70,72 @@ class JadwalController extends Controller
         ]);
     }
 
-    /**
-     * Creates a new Jadwal model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return string|\yii\web\Response
-     */
+
+    // public function actionCreate()
+    // {
+    //     $model = new Jadwal();
+    //     if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+    //         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+    //         if ($model->validate()) {
+    //             $model->save(false);
+    //             return ['success' => true];
+    //         } else {
+    //             return [
+    //                 'success' => false,
+    //                 'errors' => $model->getErrors(),
+    //             ];
+    //         }
+    //     }
+
+    //     // if ($this->request->isPost) {
+    //     //     if ($model->load($this->request->post()) && $model->save()) {
+    //     //         return $this->redirect(['view', 'id' => $model->id]);
+    //     //     }
+    //     // } else {
+    //     //     $model->loadDefaultValues();
+    //     // }
+
+    //     return $this->renderAjax('_form', [
+    //         'model' => $model,
+    //     ]);
+    // }
+
     public function actionCreate()
     {
         $model = new Jadwal();
+
+        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+            Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            if ($model->validate()) {
+                $model->flag = 1;
+                $model->save(false);
+                return ['success' => true];
+            } else {
+                return ['success' => false, 'errors' => $model->getErrors()];
+            }
+        }
+
+        return $this->renderAjax('_form', ['model' => $model]);
+    }
+
+
+    public function actionUpdate($id)
+    {
+        $model = $this->findModel($id);
+
         if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
             Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             if ($model->validate()) {
                 $model->save(false);
                 return ['success' => true];
             } else {
-                return [
-                    'success' => false,
-                    'errors' => $model->getErrors(),
-                ];
+                return ['success' => false, 'errors' => $model->getErrors()];
             }
         }
 
-        // if ($this->request->isPost) {
-        //     if ($model->load($this->request->post()) && $model->save()) {
-        //         return $this->redirect(['view', 'id' => $model->id]);
-        //     }
-        // } else {
-        //     $model->loadDefaultValues();
-        // }
-
-        return $this->renderAjax('_form', [
-            'model' => $model,
-        ]);
+        return $this->renderAjax('_form', ['model' => $model]);
     }
 
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        return $this->renderAjax('update', [
-            'model' => $model,
-        ]);
-    }
 
     /**
      * Deletes an existing Jadwal model.

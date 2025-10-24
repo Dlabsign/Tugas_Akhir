@@ -7,23 +7,14 @@ use yii\helpers\Url;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 
-
-/** @var yii\web\View $this */
-/** @var app\models\JadwalSearch $searchModel */
-/** @var yii\data\ActiveDataProvider $dataProvider */
-
 $this->title = 'Jadwal';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="jadwal-index">
-
-
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-gray-200 pb-6">
         <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-800 tracking-tight">
             List <?= Html::encode($this->title) ?>
         </h1>
-
-       <!-- Tombol buka modal create -->
         <?= Html::button('Buat Jadwal', [
             'class' => 'mt-4 md:mt-0 inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition duration-200',
             'id' => 'modalButton'
@@ -52,7 +43,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
 
                 [
-                    'label' => 'Laboratorium',
+                    'label' => 'Ruangan',
                     'attribute' => 'laboratorium_id',
                     'value' => function ($model) {
                         return $model->laboratorium ? $model->laboratorium->nama : '-';

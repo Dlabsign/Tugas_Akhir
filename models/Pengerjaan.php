@@ -21,18 +21,11 @@ use Yii;
 class Pengerjaan extends \yii\db\ActiveRecord
 {
 
-
-    /**
-     * {@inheritdoc}
-     */
     public static function tableName()
     {
         return 'pengerjaan';
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
@@ -45,10 +38,6 @@ class Pengerjaan extends \yii\db\ActiveRecord
             [['kode_soal'], 'string', 'max' => 50],
         ];
     }
-
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [
@@ -64,9 +53,16 @@ class Pengerjaan extends \yii\db\ActiveRecord
             'flag' => 'Flag',
         ];
     }
-
     public function getMahasiswa()
     {
         return $this->hasOne(Mahasiswa::class, ['id' => 'mahasiswa_id']);
+    }
+    public function getDetailSoal()
+    {
+        return $this->hasOne(Detail_soal::class, ['id' => 'soal_id']);
+    }
+    public function getJadwal()
+    {
+        return $this->hasOne(Jadwal::class, ['id' => 'sesi_id'])->via('detailSoal');
     }
 }

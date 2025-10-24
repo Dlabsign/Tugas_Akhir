@@ -6,6 +6,7 @@ use app\models\Pengguna;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use yii\helpers\Url;
 
 $labs = ArrayHelper::map(Laboratorium::find()->where(['flag' => 1])->all(), 'id', 'nama');
 $staff = ArrayHelper::map(Pengguna::find()->where(['flag' => 1])->all(), 'id', 'username');
@@ -14,76 +15,85 @@ $matkul = ArrayHelper::map(Matakuliah::find()->where(['flag' => 1])->all(), 'id'
 
 <div class="jadwal-form">
     <?php $form = ActiveForm::begin([
-        'id' => 'laboratorium-form',
+        'id' => 'jadwal-form',
         'enableAjaxValidation' => false,
-        'options' => ['onsubmit' => 'return false;'], // cegah submit default
     ]); ?>
+
+    <?= $form->field($model, 'id')->hiddenInput()->label(false) ?>
 
     <div class="row">
         <div class="col-md-6">
             <?= $form->field($model, 'sesi')->label('Masukkan Sesi')->textInput() ?>
         </div>
         <div class="col-md-6">
-            <?= $form->field($model, 'laboratorium_id')->dropDownList(
-                $labs,
-                ['prompt' => '-- Pilih Laboratorium --']
-            ); ?>
-        </div>
-        <hr>
-        <br>
-        <div class="row">
-            <div class="col-md-4">
-                <?= $form->field($model, 'tanggal_jadwal')->label('Tanggal Mulai')->textInput(['type' => 'date']) ?>
-            </div>
-            <div class="col-md-4">
-                <?= $form->field($model, 'waktu_mulai')->input('time')->label('Waktu Mulai') ?>
-            </div>
-            <div class="col-md-4">
-                <?= $form->field($model, 'waktu_selesai')->input('time')->label('Waktu Selesai') ?>
-            </div>
-        </div>
-        <hr>
-        <br>
-        <div class="row">
-            <div class="col-md-6">
-
-                <?= $form->field($model, 'dibuat_oleh_staff_id')->dropDownList(
-                    $staff,
-                ); ?>
-            </div>
-            <div class="col-md-6">
-                <?= $form->field($model, 'matakuliah_id')->dropDownList(
-                    $matkul,
-                ); ?>
-            </div>
-            <?= Html::submitButton('Simpan', ['class' => 'inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition duration-200 no-underline']) ?>
-
-            <?php ActiveForm::end(); ?>
+            <?= $form->field($model, 'laboratorium_id')->dropDownList($labs, ['prompt' => '-- Pilih Laboratorium --']) ?>
         </div>
     </div>
+
+    <hr><br>
+
+    <div class="row">
+        <div class="col-md-4">
+            <?= $form->field($model, 'tanggal_jadwal')->label('Tanggal Jadwal')->input('date') ?>
+        </div>
+        <div class="col-md-4">
+            <?= $form->field($model, 'waktu_mulai')->label('Waktu Mulai')->input('time') ?>
+        </div>
+        <div class="col-md-4">
+            <?= $form->field($model, 'waktu_selesai')->label('Waktu Selesai')->input('time') ?>
+        </div>
+    </div>
+
+    <hr><br>
+
+    <div class="row">
+        <div class="col-md-6">
+            <?= $form->field($model, 'dibuat_oleh_staff_id')->dropDownList($staff, ['prompt' => '-- Pilih Staff --']) ?>
+        </div>
+        <div class="col-md-6">
+            <?= $form->field($model, 'matakuliah_id')->dropDownList($matkul, ['prompt' => '-- Pilih Matakuliah --']) ?>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <?= Html::button(
+            $model->isNewRecord ? 'Simpan' : 'Perbarui',
+            ['id' => 'btn-save', 'class' => 'btn btn-primary w-100 mt-3']
+        ) ?>
+    </div>
+
+    <?php ActiveForm::end(); ?>
 </div>
 
-
 <?php
-$createUrl = \yii\helpers\Url::to(['jadwal/create']);
+$createUrl = Url::to(['jadwal/create']);
+$updateUrl = Url::to(['jadwal/update']);
+
 $js = <<<JS
-$('#btn-save').on('click', function(e) {
+$('#btn-save').off('click').on('click', function(e) {
     e.preventDefault();
+
     var form = $('#jadwal-form');
+    var id = form.find('#jadwal-id').val();
+    var url = id ? '$updateUrl?id=' + id : '$createUrl';
+
     $.ajax({
-        url: '$createUrl',
+        url: url,
         type: 'POST',
         data: form.serialize(),
         success: function(res) {
             if (res.success) {
-                alert('Data berhasil disimpan!');
-                location.reload();
-            } else {
-                if (res.errors && res.errors.nama) {
-                    alert(res.errors.nama[0]); // tampilkan pesan unik
+                // Tutup modal langsung tanpa notifikasi
+                $('#modalCreate').modal('hide');
+                // Reload tabel (jika pakai Pjax)
+                if ($.pjax) {
+                    $.pjax.reload({container: '#w0-pjax'});
                 } else {
-                    alert('Gagal menyimpan data!');
+                    location.reload();
                 }
+            } else if (res.errors) {
+                let msg = Object.values(res.errors).map(err => err[0]).join('\\n');
+                alert('Gagal menyimpan data:\\n' + msg);
             }
         },
         error: function() {

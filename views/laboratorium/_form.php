@@ -20,7 +20,7 @@ use yii\widgets\ActiveForm;
         </div>
     </div>
 
-    <?= Html::submitButton('Simpan', ['class' => 'inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition duration-200 no-underline']) ?>
+    <?= Html::submitButton('Simpan', ['id' => 'btn-save', 'class' => 'inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition duration-200 no-underline']) ?>
 
     <?php ActiveForm::end(); ?>
 </div>

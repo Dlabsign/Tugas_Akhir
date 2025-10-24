@@ -30,10 +30,10 @@ class Detail_soal extends \yii\db\ActiveRecord
     {
         return [
             [['flag', 'nama_file', 'data'], 'default', 'value' => null],
-            [['kode_soal', 'teks_soal', 'skor_maks', 'sesi_id'], 'required'],
-            [['matakuliah_id', 'sesi_id',  'flag'], 'integer'],
+            [['kode_soal', 'teks_soal', 'skor_maks', 'sesi_id','type'], 'required'],
+            [['matakuliah_id', 'sesi_id',  'flag','bahasa'], 'integer'],
             [['teks_soal', 'data'], 'string'],
-            [['skor_maks'], 'number'],
+            // [['skor_maks'], 'number'],
             [['kode_soal'], 'string', 'max' => 50],
             [['nama_file'], 'string', 'max' => 255],
         ];
@@ -47,9 +47,10 @@ class Detail_soal extends \yii\db\ActiveRecord
             'bobot_soal' => 'Bobot Soal',
             'kode_soal' => 'Kode Soal',
             'teks_soal' => 'Teks Soal',
-            'skor_maks' => 'Skor Maks',
+            // 'skor_maks' => 'Skor Maks',
             'flag' => 'Flag',
-            'nama_file' => 'Nama File',
+            'type' => 'Type',
+            'bahasa' => 'Bahasa Program',
             'data' => 'Data',
         ];
     }

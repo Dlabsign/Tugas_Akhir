@@ -16,19 +16,10 @@ use yii\db\Expression;
  */
 class Matakuliah extends \yii\db\ActiveRecord
 {
-
-
-    /**
-     * {@inheritdoc}
-     */
     public static function tableName()
     {
         return 'matakuliah';
     }
-
-    /**
-     * {@inheritdoc}
-     */
     public function rules()
     {
         return [
@@ -40,10 +31,6 @@ class Matakuliah extends \yii\db\ActiveRecord
             [['created_at'], 'safe'],
         ];
     }
-
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [
@@ -54,7 +41,6 @@ class Matakuliah extends \yii\db\ActiveRecord
             'flag' => 'Flag',
         ];
     }
-
     public function behaviors()
     {
         return [
@@ -66,7 +52,6 @@ class Matakuliah extends \yii\db\ActiveRecord
             ],
         ];
     }
-
     public function beforeSave($insert)
     {
         if (parent::beforeSave($insert)) {

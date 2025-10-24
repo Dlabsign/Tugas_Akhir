@@ -43,7 +43,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     'class' => 'yii\grid\SerialColumn',
                     'contentOptions' => ['style' => 'width: 50px; text-align: center; font-weight: bold;'],
                 ],
-
                 // 2. Kolom Role (Peran)
                 [
                     'label' => 'Role',

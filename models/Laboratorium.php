@@ -38,10 +38,6 @@ class Laboratorium extends \yii\db\ActiveRecord
             [['nama'], 'unique'],
         ];
     }
-
-    /**
-     * {@inheritdoc}
-     */
     public function attributeLabels()
     {
         return [

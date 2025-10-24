@@ -11,12 +11,13 @@ use yii\web\UploadedFile;
 class UploadExcelForm extends Model
 {
     public $excelFile;
-    public $sesi_id;
+    // public $sesi_id;
+    public $kode_soal;
 
     public function rules()
     {
         return [
-            [['sesi_id'], 'integer'],
+            [['kode_soal'], 'integer'],
             // [['excelFile', 'sesi_id'], 'required', 'message' => 'Silakan pilih file.'],
             [['excelFile'], 'file', 'skipOnEmpty' => false, 'checkExtensionByMimeType' => false],
         ];
@@ -27,6 +28,7 @@ class UploadExcelForm extends Model
     {
         return [
             'excelFile' => 'File Excel Mahasiswa',
+            'kode_soal'=>'Kode Soal',
         ];
     }
 

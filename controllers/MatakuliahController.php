@@ -5,9 +5,12 @@ namespace app\controllers;
 use app\models\Matakuliah;
 use app\models\MatakulliahSearch;
 use Yii;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
+
 
 class MatakuliahController extends Controller
 {
@@ -16,17 +19,24 @@ class MatakuliahController extends Controller
      */
     public function behaviors()
     {
-        return array_merge(
-            parent::behaviors(),
-            [
-                'verbs' => [
-                    'class' => VerbFilter::className(),
-                    'actions' => [
-                        'delete' => ['POST'],
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'only' => ['index', 'view', 'create', 'update', 'delete'], // aksi yang dibatasi
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'], // hanya pengguna login
                     ],
                 ],
-            ]
-        );
+            ],
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => [
+                    'delete' => ['POST'],
+                ],
+            ],
+        ];
     }
 
     /**
@@ -61,37 +71,30 @@ class MatakuliahController extends Controller
     public function actionCreate()
     {
         $model = new Matakuliah();
-
-        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
-            Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            if ($model->validate()) {
-                $model->save(false);
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            if (Yii::$app->request->isAjax) {
+                Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
                 return ['success' => true];
-            } else {
-                return [
-                    'success' => false,
-                    'errors' => $model->getErrors(),
-                ];
             }
+            return $this->redirect(['index']);
         }
-
-        return $this->renderAjax('_form', [
-            'model' => $model,
-        ]);
+        return $this->renderAjax('_form', ['model' => $model]);
     }
-
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            if (Yii::$app->request->isAjax) {
+                Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                return ['success' => true];
+            }
             return $this->redirect(['index']);
         }
-
-        return $this->renderAjax('update', [
-            'model' => $model,
-        ]);
+        return $this->renderAjax('_form', ['model' => $model]);
     }
+
+
+
 
     /**
      * Deletes an existing Matakuliah model.

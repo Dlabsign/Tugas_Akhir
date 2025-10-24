@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\Laboratorium;
 use app\models\LaboratoriumSearch;
 use Yii;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -13,17 +14,24 @@ class LaboratoriumController extends Controller
 {
     public function behaviors()
     {
-        return array_merge(
-            parent::behaviors(),
-            [
-                'verbs' => [
-                    'class' => VerbFilter::className(),
-                    'actions' => [
-                        'delete' => ['POST'],
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'only' => ['index', 'view', 'create', 'update', 'delete'], // aksi yang dibatasi
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'roles' => ['@'], // hanya pengguna login
                     ],
                 ],
-            ]
-        );
+            ],
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => [
+                    'delete' => ['POST'],
+                ],
+            ],
+        ];
     }
 
     public function actionIndex()

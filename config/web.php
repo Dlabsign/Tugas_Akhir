@@ -1,5 +1,7 @@
 <?php
 
+use skeeks\yii2\googleApi\GoogleApiComponent;
+
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
@@ -63,6 +65,11 @@ $config = [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [],
+        ],
+      
+        'gemini' => [
+            'class' => 'app\components\GeminiApi',
+            'apiKey' => 'AIzaSyCDHBEr42kb217r-oCjm88KfaP17wRCqOA',
         ],
     ],
     'params' => $params,

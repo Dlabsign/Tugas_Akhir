@@ -23,10 +23,8 @@ class Pengguna extends \yii\db\ActiveRecord implements IdentityInterface
             [['created_at', 'update_at', ' confirm_password', 'new_password'], 'safe'],
             [['password', 'username'], 'string', 'max' => 255],
             [['lab_id'], 'string', 'max' => 50],
-
         ];
     }
-
     public function attributeLabels()
     {
         return [
