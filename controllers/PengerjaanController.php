@@ -5,6 +5,9 @@ namespace app\controllers;
 use app\models\Detail_soal;
 use app\models\Detail_soalSearch;
 use app\models\Jadwal;
+use yii\web\Response; // <-- BARIS INI YANG MEMPERBAIKI ERROR
+
+use app\models\Mahasiswa;
 use app\models\Pengerjaan;
 use app\models\PengerjaanSearch;
 use Yii;
@@ -38,18 +41,38 @@ class PengerjaanController extends Controller
         ];
     }
 
-
     // NIlai Akhir
+    // public function actionPenilaianAkhir()
+    // {
+    //     $query = \app\models\Mahasiswa::find()
+    //         ->joinWith(['pengerjaan'])
+    //         ->select([
+    //             'mahasiswa.*',
+    //             'pengerjaan.skor'
+    //         ]);
+
+    //     $dataProvider = new \yii\data\ActiveDataProvider([
+    //         'query' => $query,
+    //     ]);
+
+    //     return $this->render('penilaian-akhir', [
+    //         'dataProvider' => $dataProvider,
+    //     ]);
+    // }
+
+
     public function actionPenilaianAkhir()
     {
-        $query = \app\models\Mahasiswa::find()
-            ->joinWith(['pengerjaan'])
+        // Query ini sekarang menghitung rata-rata skor AI untuk setiap mahasiswa
+        $query = Mahasiswa::find()
             ->select([
-                'mahasiswa.*',
-                'pengerjaan.skor'
-            ]);
+                'mahasiswa.*', // Ambil semua kolom dari tabel mahasiswa
+                'AVG(pengerjaan.skor) AS avg_skor' // Hitung rata-rata dan beri nama 'avg_skor'
+            ])
+            ->joinWith('pengerjaan', false, 'LEFT JOIN') // Selalu gunakan LEFT JOIN
+            ->groupBy(['mahasiswa.id']); // Kelompokkan berdasarkan ID mahasiswa
 
-        $dataProvider = new \yii\data\ActiveDataProvider([
+        $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
 
@@ -59,30 +82,129 @@ class PengerjaanController extends Controller
     }
 
 
-    public function actionUpdateNilai()
+    // public function actionUpdateNilai()
+    // {
+    //     Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+    //     $id = Yii::$app->request->post('id');
+    //     $field = Yii::$app->request->post('field');
+    //     $value = Yii::$app->request->post('value');
+
+    //     $model = \app\models\Mahasiswa::findOne($id);
+    //     if (!$model) {
+    //         return ['success' => false, 'message' => 'Mahasiswa tidak ditemukan'];
+    //     }
+
+    //     if (!in_array($field, ['nilai_sikap', 'nilai_kedisiplinan'])) {
+    //         return ['success' => false, 'message' => 'Kolom tidak valid'];
+    //     }
+
+    //     $model->$field = (int)$value;
+    //     if ($model->save(false)) {
+    //         return ['success' => true];
+    //     }
+
+    //     return ['success' => false, 'message' => 'Gagal menyimpan'];
+    // }
+
+    public function actionUpdateNilaiManual()
     {
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-
-        $id = Yii::$app->request->post('id');
-        $field = Yii::$app->request->post('field');
-        $value = Yii::$app->request->post('value');
-
-        $model = \app\models\Mahasiswa::findOne($id);
-        if (!$model) {
-            return ['success' => false, 'message' => 'Mahasiswa tidak ditemukan'];
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $request = Yii::$app->request;
+        if ($request->isAjax) {
+            $id = $request->post('id'); 
+            $field = $request->post('field'); 
+            $value = $request->post('value');
+            $mahasiswa = \app\models\Mahasiswa::findOne($id);
+            if (!$mahasiswa) {
+                return ['status' => 'error', 'message' => 'Mahasiswa tidak ditemukan'];
+            }
+            if ($field === 'nilai_sikap' || $field === 'nilai_kedisiplinan') {
+                $mahasiswa->{$field} = $value;
+            } else {
+                return ['status' => 'error', 'message' => 'Field tidak valid'];
+            }
+            $skor_ai_raw = Pengerjaan::find()
+                ->where(['mahasiswa_id' => $id])
+                ->average('skor');
+            $skor_ai = $skor_ai_raw ?? 0;
+            $skor_sikap = $mahasiswa->nilai_sikap ?? 0;
+            $skor_disiplin = $mahasiswa->nilai_kedisiplinan ?? 0;
+            $skor_manual = ($skor_sikap + $skor_disiplin) / 2;
+            $nilai_akhir = ($skor_manual * 0.7) + ($skor_ai * 0.3);
+            $mahasiswa->nilai_akhir = $nilai_akhir;
+            if ($mahasiswa->save(false)) {
+                return [
+                    'status' => 'success',
+                    'message' => 'Tersimpan',
+                    'nilai_akhir' => round($nilai_akhir, 2) // Kirim kembali nilai akhir yang baru
+                ];
+            } else {
+                return ['status' => 'error', 'message' => 'Gagal menyimpan', 'errors' => $mahasiswa->errors];
+            }
         }
-
-        if (!in_array($field, ['nilai_sikap', 'nilai_kedisiplinan'])) {
-            return ['success' => false, 'message' => 'Kolom tidak valid'];
-        }
-
-        $model->$field = (int)$value;
-        if ($model->save(false)) {
-            return ['success' => true];
-        }
-
-        return ['success' => false, 'message' => 'Gagal menyimpan'];
+        return ['status' => 'error', 'message' => 'Invalid request'];
     }
+    // public function actionUpdateNilaiManual()
+    // {
+    //     Yii::$app->response->format = Response::FORMAT_JSON;
+    //     $request = Yii::$app->request;
+
+    //     if ($request->isAjax) {
+    //         $id = $request->post('id'); // ID Mahasiswa
+    //         $field = $request->post('field'); // 'nilai_sikap' atau 'nilai_kedisiplinan'
+    //         $value = $request->post('value');
+
+    //         // Gunakan namespace lengkap untuk model Mahasiswa
+    //         $mahasiswa = \app\models\Mahasiswa::findOne($id);
+
+    //         if (!$mahasiswa) {
+    //             return ['status' => 'error', 'message' => 'Mahasiswa tidak ditemukan'];
+    //         }
+
+    //         // 1. Update nilai manual yang diubah
+    //         if ($field === 'nilai_sikap' || $field === 'nilai_kedisiplinan') {
+    //             $mahasiswa->{$field} = $value;
+    //         } else {
+    //             return ['status' => 'error', 'message' => 'Field tidak valid'];
+    //         }
+
+    //         // 2. Ambil komponen nilai
+    //         // --- PERBAIKAN PENTING: Hitung rata-rata skor AI ---
+    //         // Ini mengambil rata-rata dari SEMUA pengerjaan mahasiswa
+    //         $skor_ai_raw = Pengerjaan::find()
+    //             ->where(['mahasiswa_id' => $id])
+    //             ->average('skor');
+
+    //         $skor_ai = $skor_ai_raw ?? 0;
+    //         // --- AKHIR PERBAIKAN ---
+
+    //         $skor_sikap = $mahasiswa->nilai_sikap ?? 0;
+    //         $skor_disiplin = $mahasiswa->nilai_kedisiplinan ?? 0;
+
+    //         // 3. Hitung Skor Manual (Rata-rata sikap & disiplin)
+    //         $skor_manual = ($skor_sikap + $skor_disiplin) / 2;
+
+    //         // 4. Hitung Nilai Akhir Hibrida (70% Manual, 30% AI)
+    //         $nilai_akhir = ($skor_manual * 0.7) + ($skor_ai * 0.3);
+
+    //         // 5. Simpan nilai akhir ke database
+    //         $mahasiswa->nilai_akhir = $nilai_akhir;
+
+    //         // Gunakan save(false) sesuai kode yang Anda berikan
+    //         if ($mahasiswa->save(false)) {
+    //             return [
+    //                 'status' => 'success',
+    //                 'message' => 'Tersimpan',
+    //                 'nilai_akhir' => round($nilai_akhir, 2) // Kirim kembali nilai akhir yang baru
+    //             ];
+    //         } else {
+    //             return ['status' => 'error', 'message' => 'Gagal menyimpan', 'errors' => $mahasiswa->errors];
+    //         }
+    //     }
+
+    //     return ['status' => 'error', 'message' => 'Invalid request'];
+    // }
 
     public function actionNilaiPerSesi()
     {
@@ -108,7 +230,6 @@ class PengerjaanController extends Controller
 
 
     // Nilai Soal
-
     public function actionPenilaianSoal()
     {
         $soalList = \app\models\Detail_soal::find()
@@ -301,10 +422,9 @@ class PengerjaanController extends Controller
             $prompt = "Soal: {$teksSoal}\n\n" .
                 "Jawaban siswa: {$model->jawaban_teks}\n\n" .
                 "Tugas Anda: Beri umpan balik singkat, objektif, dan jelas apakah jawaban tersebut sudah benar atau salah sesuai soal. 
-                Jika salah, jelaskan bagian mana yang kurang tepat.";
+                Jika salah, jelaskan bagian mana yang kurang tepat. Hilangkan penulisan bold atau bintan **.";
 
             $feedback = Yii::$app->gemini->generateText($prompt);
-
             if ($feedback) {
                 $model->umpan_balik = $feedback;
                 $model->save(false);
@@ -427,7 +547,6 @@ class PengerjaanController extends Controller
             foreach ($jawabanList as $i => $jawabanA) {
                 for ($j = $i + 1; $j < count($jawabanList); $j++) {
                     $jawabanB = $jawabanList[$j];
-
                     $prompt = "Bandingkan jawaban jawaban berikut:\n\n" .
                         "Jawaban 1 (NIM {$jawabanA->mahasiswa->nim}): {$jawabanA->jawaban_teks}\n\n" .
                         "Jawaban 2 (NIM {$jawabanB->mahasiswa->nim}): {$jawabanB->jawaban_teks}\n\n" .

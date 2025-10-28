@@ -29,13 +29,13 @@ class Detail_soal extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['flag', 'nama_file', 'data'], 'default', 'value' => null],
-            [['kode_soal', 'teks_soal', 'skor_maks', 'sesi_id','type'], 'required'],
-            [['matakuliah_id', 'sesi_id',  'flag','bahasa'], 'integer'],
+            [['flag', 'data'], 'default', 'value' => null],
+            [['kode_soal', 'teks_soal', 'skor_maks', 'sesi_id', 'type'], 'required'],
+            [['matakuliah_id', 'sesi_id',  'flag', 'bahasa'], 'integer'],
             [['teks_soal', 'data'], 'string'],
             // [['skor_maks'], 'number'],
             [['kode_soal'], 'string', 'max' => 50],
-            [['nama_file'], 'string', 'max' => 255],
+            // [['nama_file'], 'string', 'max' => 255],
         ];
     }
     public function attributeLabels()
@@ -54,13 +54,11 @@ class Detail_soal extends \yii\db\ActiveRecord
             'data' => 'Data',
         ];
     }
-
     public function delete()
     {
         $this->flag = 0;
         return $this->save(false, ['flag']);
     }
-
     public function beforeSave($insert)
     {
         if (parent::beforeSave($insert)) {

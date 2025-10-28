@@ -16,7 +16,7 @@ class Jadwal extends \yii\db\ActiveRecord
     {
         return [
             [['flag'], 'default', 'value' => null],
-            [['laboratorium_id', 'tanggal_jadwal', 'waktu_mulai', 'waktu_selesai', 'dibuat_oleh_staff_id', 'sesi'], 'required'],
+            [['laboratorium_id','matakuliah_id', 'tanggal_jadwal', 'waktu_mulai', 'waktu_selesai', 'dibuat_oleh_staff_id', 'sesi'], 'required'],
             [['laboratorium_id', 'dibuat_oleh_staff_id', 'flag', 'sesi', 'matakuliah_id'], 'integer'],
             [['tanggal_jadwal', 'waktu_mulai', 'waktu_selesai', 'created_at'], 'safe'],
 

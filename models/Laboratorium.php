@@ -36,6 +36,9 @@ class Laboratorium extends \yii\db\ActiveRecord
             [['nama'], 'string', 'max' => 100],
             [['ruang'], 'string', 'max' => 255],
             [['nama'], 'unique'],
+            // Kode Testing
+            [['ruang'], 'unique', 'targetAttribute' => 'ruang', 'message' => 'Ruangan sudah dipakai.'],
+            [['ruang'], 'required', 'message' => 'Nama ruangan tidak boleh kosong.'],
         ];
     }
     public function attributeLabels()

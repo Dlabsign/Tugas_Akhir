@@ -144,7 +144,7 @@ $createUrlJs = json_encode($createUrl);
 $script = <<<JS
 // CREATE
 $('#modalButton').on('click', function () {
-    $('#modalCreate .modal-title').text('Buat Ruangan Baru');
+    $('#modalCreate .modal-title').text('Jadwal');
     $('#modalCreate').modal('show')
         .find('#modalContent')
         .load({$createUrlJs});
@@ -154,7 +154,7 @@ $('#modalButton').on('click', function () {
 $(document).on('click', '.modalUpdateBtn', function (e) {
     e.preventDefault();
     var url = $(this).data('url');
-    $('#modalCreate .modal-title').text('Ubah Ruangan');
+    $('#modalCreate .modal-title').text('Ubah Jadwal');
     $('#modalCreate').modal('show')
         .find('#modalContent')
         .load(url);

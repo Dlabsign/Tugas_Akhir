@@ -159,7 +159,6 @@ class JadwalController extends Controller
                 return ['success' => false, 'errors' => $model->getErrors()];
             }
         }
-
         return $this->renderAjax('_form', ['model' => $model]);
     }
 

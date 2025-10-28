@@ -6,6 +6,7 @@ use Yii;
 
 class Mahasiswa extends \yii\db\ActiveRecord
 {
+    public $avg_skor;
     public static function tableName()
     {
         return 'mahasiswa';

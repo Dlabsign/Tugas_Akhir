@@ -11,17 +11,11 @@ class GeminiApi extends Component
     public $apiKey;
     public $model = "gemini-2.5-pro";  // atau “gemini-2.5-pro” tergantung model yang Anda akses
 
-    /**
-     * Kirim prompt ke Gemini API dan kembalikan teks hasilnya
-     * @param string $prompt
-     * @return string|null
-     */
     public function generateText(string $prompt): ?string
     {
         $client = new Client();
         // Gunakan v1 (bukan v1beta)
         $url = "https://generativelanguage.googleapis.com/v1/models/{$this->model}:generateContent?key={$this->apiKey}";
-
         $postData = [
             "contents" => [[
                 "parts" => [[
@@ -29,7 +23,7 @@ class GeminiApi extends Component
                 ]]
             ]]
         ];
-
+        
         try {
             $response = $client->post($url, [
                 'headers' => [
@@ -37,9 +31,7 @@ class GeminiApi extends Component
                 ],
                 'json' => $postData,
             ]);
-
             $data = json_decode($response->getBody()->getContents(), true);
-
             return $data['candidates'][0]['content']['parts'][0]['text'] ?? null;
         } catch (RequestException $ex) {
             // Bila error, bisa log atau debug isi responsnya
