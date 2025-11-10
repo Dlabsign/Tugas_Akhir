@@ -402,7 +402,6 @@ class PengerjaanController extends Controller
         ]);
     }
 
-
     // fungsi nilai tetap bisa dipakai
     public function actionNilai($id)
     {

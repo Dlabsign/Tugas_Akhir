@@ -26,6 +26,10 @@ $config = [
         //     'enableAutoLogin' => true,
         // ],
 
+        'hashid' => [
+            'class' => 'app\components\HashId',
+        ],
+
         'user' => [
             'identityClass' => 'app\models\User',
             'enableAutoLogin' => true,
@@ -64,9 +68,11 @@ $config = [
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
-            'rules' => [],
+            'rules' => [
+                'post/<slug>' => 'post/view',
+            ],
         ],
-      
+
         'gemini' => [
             'class' => 'app\components\GeminiApi',
             'apiKey' => 'AIzaSyCDHBEr42kb217r-oCjm88KfaP17wRCqOA',
