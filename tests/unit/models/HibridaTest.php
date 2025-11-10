@@ -195,8 +195,6 @@ class HibridaTest extends Unit
             83,
             52,
             100,
-
-
         ];
 
         $n = count($manualScores);
