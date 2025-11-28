@@ -112,8 +112,8 @@ class PengerjaanController extends Controller
         Yii::$app->response->format = Response::FORMAT_JSON;
         $request = Yii::$app->request;
         if ($request->isAjax) {
-            $id = $request->post('id'); 
-            $field = $request->post('field'); 
+            $id = $request->post('id');
+            $field = $request->post('field');
             $value = $request->post('value');
             $mahasiswa = \app\models\Mahasiswa::findOne($id);
             if (!$mahasiswa) {
@@ -403,40 +403,40 @@ class PengerjaanController extends Controller
     }
 
     // fungsi nilai tetap bisa dipakai
-    public function actionNilai($id)
-    {
-        $model = Pengerjaan::findOne($id);
-        if (!$model) {
-            throw new NotFoundHttpException("Pengerjaan tidak ditemukan.");
-        }
+    // public function actionNilai($id)
+    // {
+    //     $model = Pengerjaan::findOne($id);
+    //     if (!$model) {
+    //         throw new NotFoundHttpException("Pengerjaan tidak ditemukan.");
+    //     }
 
-        if (!$model->jawaban_teks) {
-            Yii::$app->session->setFlash('error', 'Jawaban kosong, tidak bisa dinilai.');
-            return $this->redirect(Yii::$app->request->referrer ?: ['index']);
-        }
+    //     if (!$model->jawaban_teks) {
+    //         Yii::$app->session->setFlash('error', 'Jawaban kosong, tidak bisa dinilai.');
+    //         return $this->redirect(Yii::$app->request->referrer ?: ['index']);
+    //     }
 
-        try {
-            $teksSoal = $model->detailSoal->teks_soal ?? "(soal tidak ditemukan)";
+    //     try {
+    //         $teksSoal = $model->detailSoal->teks_soal ?? "(soal tidak ditemukan)";
 
-            $prompt = "Soal: {$teksSoal}\n\n" .
-                "Jawaban siswa: {$model->jawaban_teks}\n\n" .
-                "Tugas Anda: Beri umpan balik singkat, objektif, dan jelas apakah jawaban tersebut sudah benar atau salah sesuai soal. 
-                Jika salah, jelaskan bagian mana yang kurang tepat. Hilangkan penulisan bold atau bintan **.";
+    //         $prompt = "Soal: {$teksSoal}\n\n" .
+    //             "Jawaban siswa: {$model->jawaban_teks}\n\n" .
+    //             "Tugas Anda: Beri umpan balik singkat, objektif, dan jelas apakah jawaban tersebut sudah benar atau salah sesuai soal. 
+    //             Jika salah, jelaskan bagian mana yang kurang tepat. Hilangkan penulisan bold atau bintang **.";
 
-            $feedback = Yii::$app->gemini->generateText($prompt);
-            if ($feedback) {
-                $model->umpan_balik = $feedback;
-                $model->save(false);
-                Yii::$app->session->setFlash('success', 'Penilaian berhasil disimpan.');
-            } else {
-                Yii::$app->session->setFlash('error', 'Gagal mendapatkan feedback dari Gemini.');
-            }
-        } catch (\Exception $e) {
-            Yii::$app->session->setFlash('error', 'Error: ' . $e->getMessage());
-        }
+    //         $feedback = Yii::$app->gemini->generateText($prompt);
+    //         if ($feedback) {
+    //             $model->umpan_balik = $feedback;
+    //             $model->save(false);
+    //             Yii::$app->session->setFlash('success', 'Penilaian berhasil disimpan.');
+    //         } else {
+    //             Yii::$app->session->setFlash('error', 'Gagal mendapatkan feedback dari Gemini.');
+    //         }
+    //     } catch (\Exception $e) {
+    //         Yii::$app->session->setFlash('error', 'Error: ' . $e->getMessage());
+    //     }
 
-        return $this->redirect(Yii::$app->request->referrer ?: ['index']);
-    }
+    //     return $this->redirect(Yii::$app->request->referrer ?: ['index']);
+    // }
 
     // public function actionNilai($id)
     // {
@@ -515,6 +515,60 @@ class PengerjaanController extends Controller
     // }
 
 
+    public function actionNilai($id)
+    {
+        $model = Pengerjaan::findOne($id);
+        if (!$model) {
+            throw new NotFoundHttpException("Pengerjaan tidak ditemukan.");
+        }
+
+        if (!$model->jawaban_teks) {
+            Yii::$app->session->setFlash('error', 'Jawaban kosong, tidak bisa dinilai.');
+            return $this->redirect(Yii::$app->request->referrer ?: ['index']);
+        }
+
+        try {
+            $teksSoal = $model->detailSoal->teks_soal ?? "(soal tidak ditemukan)";
+
+            // ======= PROMPT SUPER RINGKAS =======
+            $prompt = "
+Rubrik SQL:
+1. DDL (25%):
+   4=90 (tepat & efisien), 3=75 (minor salah), 2=60 (banyak salah), 1=10 (tidak paham)
+2. DML (50%):
+   4=90 (benar, efisien, aman), 3=75 (minor salah), 2=60 (banyak salah), 1=10 (tidak paham)
+3. Lanjutan (25%):
+   4=90 (JOIN/Subquery/Agregasi/SP benar), 3=75 (kurang kompleks/minor bug), 2=60 (bermasalah), 1=10 (tidak paham)
+
+Instruksi:
+- Beri skor 1–4 per aspek + alasan singkat.
+- Konversi skor ke nilai (10,60,75,90).
+- Hitung nilai akhir berbobot.
+- Berikan ringkasan penilaian yang objektif dan jelas.
+
+Soal:
+{$teksSoal}
+
+Jawaban siswa:
+{$model->jawaban_teks}
+";
+            // ===================================
+
+            $feedback = Yii::$app->gemini->generateText($prompt);
+
+            if ($feedback) {
+                $model->umpan_balik = $feedback;
+                $model->save(false);
+                Yii::$app->session->setFlash('success', 'Penilaian berhasil disimpan.');
+            } else {
+                Yii::$app->session->setFlash('error', 'Gagal mendapatkan feedback dari Gemini.');
+            }
+        } catch (\Exception $e) {
+            Yii::$app->session->setFlash('error', 'Error: ' . $e->getMessage());
+        }
+
+        return $this->redirect(Yii::$app->request->referrer ?: ['index']);
+    }
 
     public function actionCekDuplikat($id)
     {

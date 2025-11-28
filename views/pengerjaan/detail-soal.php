@@ -16,7 +16,7 @@ $this->title = "Detail Soal";
     'columns' => [
         ['class' => 'yii\grid\SerialColumn'],
         'teks_soal:ntext',
-        'bobot_soal',
+        // 'bobot_soal',
         // 'skor_maks',
         [
             'class' => 'yii\grid\ActionColumn',
@@ -24,7 +24,7 @@ $this->title = "Detail Soal";
             'buttons' => [
                 'jawaban' => function ($url, $model) {
                     return Html::a(
-                        '<span class="bi bi-chat-text"></span> Lihat Jawaban',
+                        '<span class="bi bi-eye"></span> Lihat Jawaban',
                         ['pengerjaan/detail-jawaban', 'id' => $model->id],
                         ['class' => 'btn btn-sm btn-primary']
                     );

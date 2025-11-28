@@ -29,7 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="group bg-white border border-gray-200 rounded-lg shadow-lg p-6 flex flex-col justify-between transition duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl no-underline decoration-none hover:no-underline">
             <div>
                 <div class="text-indigo-400 flex items-center justify-between mb-4">
-                    <H4 class="text-xs font-semibold ">Mata Kuliah</H4>
+                    <h1 class="font-semibold">Mata Kuliah</h1>
                     <i class="bi bi-calendar-event-fill text-3xl "></i>
                 </div>
                 <p class="text-5xl font-bold text-gray-900 mt-2"><?= $jumlahMahasiswa ?></p>
@@ -46,7 +46,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="group bg-white border border-gray-200 rounded-lg shadow-lg p-6 flex flex-col justify-between transition duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl decoration-none hover:no-underline">
             <div>
                 <div class="text-blue-400 flex items-center justify-between mb-4">
-                    <H4 class="text-xs font-semibold ">Sesi</H4>
+                    <h1 class=" font-semibold ">Sesi</h1>
                     <i class="bi bi-calendar-event-fill text-3xl "></i>
                 </div>
                 <p class="text-5xl font-bold text-gray-900 mt-2"><?= $jumlahSesi ?></p>
@@ -63,7 +63,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="group bg-white border border-gray-200 rounded-lg shadow-lg p-6 flex flex-col justify-between transition duration-300 ease-in-out hover:-translate-y-1 hover:shadow-xl decoration-none hover:no-underline">
             <div>
                 <div class="text-blue-400 flex items-center justify-between mb-4">
-                    <H4 class="text-xs font-semibold ">Mata Kuliah</H4>
+                    <h1 class=" font-semibold ">Mata Kuliah</h1>
                     <i class="bi bi-calendar-event-fill text-3xl "></i>
                 </div>
                 <p class="text-5xl font-bold text-gray-900 mt-2"><?= $jumlahMatakuliah ?></p>
@@ -110,7 +110,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php else : ?>
             <div class="flex flex-row items-center mb-2 border-b border-gray-200 pb-2">
 
-                <h4 class="font-bold text-gray-800">Tidak ada Sesi yang Berlangsung</h4>
+                <h4 class="font-bold text-gray-500">Tidak ada Sesi yang Berlangsung</h4>
             </div>
             <!-- <p class="text-gray-500">Tidak ada sesi yang berlangsung saat ini.</p> -->
         <?php endif; ?>

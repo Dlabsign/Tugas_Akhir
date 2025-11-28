@@ -152,21 +152,22 @@ if ($user) {
                                     href="#">
                                     <i class="bi bi-pencil-square me-2"></i> Penilaian
                                 </a>
-                                <ul class="dropdown-menu show" style="position: static; float: none;">
-                                    <li>
-                                        <?= Html::a(
-                                            'Penilaian Akhir',
-                                            Url::to(['pengerjaan/penilaian-akhir']),
-                                            ['class' => 'dropdown-item']
-                                        ) ?>
-                                    </li>
+                                <ul class="dropdown-menu show bg-dark" style="position: static; float: none;">
                                     <li>
                                         <?= Html::a(
                                             'Penilaian Soal',
                                             Url::to(['pengerjaan/penilaian-soal']),
-                                            ['class' => 'dropdown-item']
+                                            ['class' => 'dropdown-item text-gray-300']
                                         ) ?>
                                     </li>
+                                    <li>
+                                        <?= Html::a(
+                                            'Penilaian Akhir',
+                                            Url::to(['pengerjaan/penilaian-akhir']),
+                                            ['class' => 'dropdown-item text-gray-300']
+                                        ) ?>
+                                    </li>
+
                                 </ul>
                             </li>
                         <?php endif; ?>
@@ -212,19 +213,19 @@ if ($user) {
                                     href="#">
                                     <i class="bi bi-pencil-square me-2"></i> Penilaian
                                 </a>
-                                <ul class="dropdown-menu show" style="position: static; float: none;">
-                                    <li>
-                                        <?= Html::a(
-                                            'Penilaian Akhir',
-                                            Url::to(['pengerjaan/penilaian-akhir']),
-                                            ['class' => 'dropdown-item']
-                                        ) ?>
-                                    </li>
+                                <ul class="dropdown-menu show bg-dark" style="position: static; float: none;">
                                     <li>
                                         <?= Html::a(
                                             'Penilaian Soal',
                                             Url::to(['pengerjaan/penilaian-soal']),
-                                            ['class' => 'dropdown-item']
+                                            ['class' => 'dropdown-item text-gray-300']
+                                        ) ?>
+                                    </li>
+                                    <li>
+                                        <?= Html::a(
+                                            'Penilaian Akhir',
+                                            Url::to(['pengerjaan/penilaian-akhir']),
+                                            ['class' => 'dropdown-item text-gray-300']
                                         ) ?>
                                     </li>
                                 </ul>
@@ -255,35 +256,19 @@ if ($user) {
                                     href="#">
                                     <i class="bi bi-pencil-square me-2"></i> Penilaian
                                 </a>
-                                <ul class="" style="position: static; float: none;">
-                                    <li class="flex justify-center items-center py-3 <?= Yii::$app->controller->action->id === 'penilaian-akhir' ? 'bg-gray-700 text-slate-100 rounded-md' : 'text-slate-50' ?>">
-                                        <i class="bi bi-chevron-right ms-1 mr-2"></i>
-                                        <?= Html::a(
-                                            'Penilaian Akhir',
-                                            Url::to(['pengerjaan/penilaian-akhir']),
-                                            [
-                                                'class' => 'dropdown-item ' . (Yii::$app->controller->action->id === 'penilaian-akhir' ? 'text-slate-100 font-semibold' : 'text-slate-50')
-                                            ]
-                                        ) ?>
-                                    </li>
-                                    <li class="flex justify-center items-center py-3 <?= Yii::$app->controller->action->id === 'penilaian-soal' ? 'bg-gray-700 text-slate-100 rounded-md' : 'text-slate-50' ?>">
-                                        <i class="bi bi-chevron-right ms-1 mr-2"></i>
+                                <ul class="dropdown-menu show bg-dark" style="position: static; float: none;">
+                                    <li>
                                         <?= Html::a(
                                             'Penilaian Soal',
                                             Url::to(['pengerjaan/penilaian-soal']),
-                                            [
-                                                'class' => 'dropdown-item ' . (Yii::$app->controller->action->id === 'penilaian-soal' ? 'text-slate-100 font-semibold' : 'text-slate-50')
-                                            ]
+                                            ['class' => 'dropdown-item text-gray-300']
                                         ) ?>
                                     </li>
-                                    <li class="flex justify-center items-center py-3 <?= Yii::$app->controller->action->id === 'penilaian-soal' ? 'bg-gray-700 text-slate-100 rounded-md' : 'text-slate-50' ?>">
-                                        <i class="bi bi-chevron-right ms-1 mr-2"></i>
+                                    <li>
                                         <?= Html::a(
-                                            'Upload Gambar',
-                                            Url::to(['pengerjaan/penilaian-soal']),
-                                            [
-                                                'class' => 'dropdown-item ' . (Yii::$app->controller->action->id === 'penilaian-soal' ? 'text-slate-100 font-semibold' : 'text-slate-50')
-                                            ]
+                                            'Penilaian Akhir',
+                                            Url::to(['pengerjaan/penilaian-akhir']),
+                                            ['class' => 'dropdown-item text-gray-300']
                                         ) ?>
                                     </li>
                                 </ul>
