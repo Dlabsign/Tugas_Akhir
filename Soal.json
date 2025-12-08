@@ -1,0 +1,54 @@
+{
+    "Soal 1": {
+        "pernyataan_soal": "Buatlah database db_sekolah_NIM, kemudian buat tiga tabel tb_siswa, tb_kelas, dan tb_nilai lengkap dengan primary key dan foreign key sesuai skema",
+        "s_manual": [
+            90, 75, 10, 85, 70, 60, 95, 50, 10, 80,
+            90, 75, 65, 95, 88, 72, 69, 90, 70, 80,
+            90, 75, 65, 95, 88, 72, 69, 91, 70
+        ],
+        "s_feedback": [
+            60, 70, 55, 75, 60, 95, 85, 65, 80, 60,
+            70, 80, 85, 75, 85, 78, 82, 59, 100, 60,
+            89, 81, 66, 74, 86, 79, 81, 60, 100, 61
+        ]
+    },
+    "Soal 2": {
+        "pernyataan_soal": "Lakukan INSERT data ke dalam:\ntb_siswa sesuai data Arka s.d. Bima,\ntb_kelas sesuai\ndata tiga kelas, tb_nilai sesuai data nilai di tabel contoh.",    
+        "s_manual": [
+            90, 75, 10, 85, 70, 60, 95, 50, 10, 80,
+            90, 75, 65, 95, 88, 72, 69, 90, 70, 80,
+            90, 75, 65, 95, 88, 72, 69, 91, 70
+        ],
+        "s_feedback": [
+            60, 70, 55, 75, 60, 95, 85, 65, 80, 60,
+            70, 80, 85, 75, 85, 78, 82, 59, 100, 60,
+            89, 81, 66, 74, 86, 79, 81, 60, 100, 61
+        ]
+    },
+    "Soal 3": {
+        "pernyataan_soal": "Tampilkan semua nama siswa yang bertempat tinggal di Surabaya dari tabel tb_siswa",    
+        "s_manual": [
+            90, 75, 10, 85, 70, 60, 95, 50, 10, 80,
+            90, 75, 65, 95, 88, 72, 69, 90, 70, 80,
+            90, 75, 65, 95, 88, 72, 69, 91, 70
+        ],
+        "s_feedback": [
+            60, 70, 55, 75, 60, 95, 85, 65, 80, 60,
+            70, 80, 85, 75, 85, 78, 82, 59, 100, 60,
+            89, 81, 66, 74, 86, 79, 81, 60, 100, 61
+        ]
+    },
+    "Soal 4": {
+        "pernyataan_soal": "Tampilkan daftar nilai lengkap berisi kolom: nama_siswa, alamat_siswa, nama_kelas, dan nilai",    
+        "s_manual": [
+            90, 75, 10, 85, 70, 60, 95, 50, 10, 80,
+            90, 75, 65, 95, 88, 72, 69, 90, 70, 80,
+            90, 75, 65, 95, 88, 72, 69, 91, 70
+        ],
+        "s_feedback": [
+            60, 70, 55, 75, 60, 95, 85, 65, 80, 60,
+            70, 80, 85, 75, 85, 78, 82, 59, 100, 60,
+            89, 81, 66, 74, 86, 79, 81, 60, 100, 61
+        ]
+    }
+}
