@@ -9,7 +9,8 @@ use GuzzleHttp\Exception\RequestException;
 class GeminiApi extends Component
 {
     public $apiKey;
-    public $model = "gemini-2.5-pro";  // atau “gemini-2.5-pro” tergantung model yang Anda akses
+    // public $model = "gemini-2.5-pro";  // atau “gemini-2.5-pro” tergantung model yang Anda akses
+    public $model = "gemini-2.5-flash";
 
     public function generateText(string $prompt): ?string
     {

@@ -63,21 +63,36 @@ class PengerjaanController extends Controller
 
     public function actionPenilaianAkhir()
     {
-        // Query ini sekarang menghitung rata-rata skor AI untuk setiap mahasiswa
-        $query = Mahasiswa::find()
-            ->select([
-                'mahasiswa.*', // Ambil semua kolom dari tabel mahasiswa
-                'AVG(pengerjaan.skor) AS avg_skor' // Hitung rata-rata dan beri nama 'avg_skor'
-            ])
-            ->joinWith('pengerjaan', false, 'LEFT JOIN') // Selalu gunakan LEFT JOIN
-            ->groupBy(['mahasiswa.id']); // Kelompokkan berdasarkan ID mahasiswa
+        $nimSearch = Yii::$app->request->get('nim', '');
 
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-        ]);
+        $soalList = \app\models\Detail_soal::find()->orderBy(['kode_soal' => SORT_ASC])->all();
+
+        $grouped = [];
+        foreach ($soalList as $soal) {
+            $kode = $soal->kode_soal;
+            if (!isset($grouped[$kode])) {
+                $grouped[$kode] = ['soal_list' => []];
+            }
+            $query = Pengerjaan::find()
+                ->where(['soal_id' => $soal->id])
+                ->andWhere(['is not', 'umpan_balik', null])
+                ->andWhere(['!=', 'umpan_balik', ''])
+                ->andWhere(['is not', 'skor', null])
+                ->joinWith('mahasiswa')
+                ->andFilterWhere(['like', 'mahasiswa.nim', $nimSearch])
+                ->with('mahasiswa');
+            $dataProvider = new ActiveDataProvider([
+                'query' => $query,
+            ]);
+            $grouped[$kode]['soal_list'][] = [
+                'soal' => $soal,
+                'dataProvider' => $dataProvider,
+            ];
+        }
 
         return $this->render('penilaian-akhir', [
-            'dataProvider' => $dataProvider,
+            'grouped' => $grouped,
+            'nimSearch' => $nimSearch,
         ]);
     }
 
@@ -124,10 +139,11 @@ class PengerjaanController extends Controller
             } else {
                 return ['status' => 'error', 'message' => 'Field tidak valid'];
             }
-            $skor_ai_raw = Pengerjaan::find()
-                ->where(['mahasiswa_id' => $id])
-                ->average('skor');
-            $skor_ai = $skor_ai_raw ?? 0;
+            $skor_soal1 = Pengerjaan::find()->where(['mahasiswa_id' => $id, 'kode_soal' => 'Soal 1'])->average('skor') ?? 0;
+            $skor_soal2 = Pengerjaan::find()->where(['mahasiswa_id' => $id, 'kode_soal' => 'Soal 2'])->average('skor') ?? 0;
+            $skor_soal3 = Pengerjaan::find()->where(['mahasiswa_id' => $id, 'kode_soal' => 'Soal 3'])->average('skor') ?? 0;
+            $skor_soal4 = Pengerjaan::find()->where(['mahasiswa_id' => $id, 'kode_soal' => 'Soal 4'])->average('skor') ?? 0;
+            $skor_ai = ($skor_soal1 + $skor_soal2 + $skor_soal3 + $skor_soal4) / 4;
             $skor_sikap = $mahasiswa->nilai_sikap ?? 0;
             $skor_disiplin = $mahasiswa->nilai_kedisiplinan ?? 0;
             $skor_manual = ($skor_sikap + $skor_disiplin) / 2;
@@ -534,17 +550,20 @@ class PengerjaanController extends Controller
             $prompt = "
 Rubrik SQL:
 1. DDL (25%):
-   4=90 (tepat & efisien), 3=75 (minor salah), 2=60 (banyak salah), 1=10 (tidak paham)
+   4=85 (tepat & efisien), 3=75 (minor salah), 2=66 (banyak salah), 1=50 (tidak paham)
 2. DML (50%):
-   4=90 (benar, efisien, aman), 3=75 (minor salah), 2=60 (banyak salah), 1=10 (tidak paham)
+   4=85 (benar, efisien, aman), 3=75 (minor salah), 2=66 (banyak salah), 1=50 (tidak paham)
 3. Lanjutan (25%):
-   4=90 (JOIN/Subquery/Agregasi/SP benar), 3=75 (kurang kompleks/minor bug), 2=60 (bermasalah), 1=10 (tidak paham)
+   4=85 (JOIN/Subquery/Agregasi/SP benar), 3=75 (kurang kompleks/minor bug), 2=66 (bermasalah), 1=50 (tidak paham)
 
 Instruksi:
 - Beri skor 1–4 per aspek + alasan singkat.
-- Konversi skor ke nilai (10,60,75,90).
+- Konversi skor ke nilai (50,66,75,85).
 - Hitung nilai akhir berbobot.
 - Berikan ringkasan penilaian yang objektif dan jelas.
+- Buat jangan panjang - panjang
+- Jangan gunakan format bold atau tanda **.
+- Beri jawabannya konsisten dengan 
 
 Soal:
 {$teksSoal}
