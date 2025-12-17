@@ -136,30 +136,77 @@ class PengerjaanController extends Controller
             }
             if ($field === 'nilai_sikap' || $field === 'nilai_kedisiplinan') {
                 $mahasiswa->{$field} = $value;
+
+                // setelah update nilai manual, hitung ulang nilai akhir berdasarkan aturan
+                $skor_soal1 = Pengerjaan::find()->where(['mahasiswa_id' => $id, 'kode_soal' => 'Soal 1'])->average('skor') ?? 0;
+                $skor_soal2 = Pengerjaan::find()->where(['mahasiswa_id' => $id, 'kode_soal' => 'Soal 2'])->average('skor') ?? 0;
+                $skor_soal3 = Pengerjaan::find()->where(['mahasiswa_id' => $id, 'kode_soal' => 'Soal 3'])->average('skor') ?? 0;
+                $skor_soal4 = Pengerjaan::find()->where(['mahasiswa_id' => $id, 'kode_soal' => 'Soal 4'])->average('skor') ?? 0;
+                $skor_ai = ($skor_soal1 + $skor_soal2 + $skor_soal3 + $skor_soal4) / 4;
+                $skor_sikap = $mahasiswa->nilai_sikap ?? 0;
+                $skor_disiplin = $mahasiswa->nilai_kedisiplinan ?? 0;
+                $skor_manual = ($skor_sikap + $skor_disiplin) / 2;
+                $nilai_akhir = ($skor_manual * 0.7) + ($skor_ai * 0.3);
+                $mahasiswa->nilai_akhir = $nilai_akhir;
+
+                if ($mahasiswa->save(false)) {
+                    return [
+                        'status' => 'success',
+                        'message' => 'Tersimpan',
+                        'nilai_akhir' => round($nilai_akhir, 2)
+                    ];
+                } else {
+                    return ['status' => 'error', 'message' => 'Gagal menyimpan', 'errors' => $mahasiswa->errors];
+                }
+
+            } elseif ($field === 'nilai_akhir') {
+                // langsung simpan nilai akhir yang diisi manual tanpa perhitungan ulang
+                $mahasiswa->nilai_akhir = $value;
+                if ($mahasiswa->save(false)) {
+                    return [
+                        'status' => 'success',
+                        'message' => 'Tersimpan',
+                        'nilai_akhir' => round($mahasiswa->nilai_akhir, 2)
+                    ];
+                }
+                return ['status' => 'error', 'message' => 'Gagal menyimpan', 'errors' => $mahasiswa->errors];
             } else {
                 return ['status' => 'error', 'message' => 'Field tidak valid'];
             }
-            $skor_soal1 = Pengerjaan::find()->where(['mahasiswa_id' => $id, 'kode_soal' => 'Soal 1'])->average('skor') ?? 0;
-            $skor_soal2 = Pengerjaan::find()->where(['mahasiswa_id' => $id, 'kode_soal' => 'Soal 2'])->average('skor') ?? 0;
-            $skor_soal3 = Pengerjaan::find()->where(['mahasiswa_id' => $id, 'kode_soal' => 'Soal 3'])->average('skor') ?? 0;
-            $skor_soal4 = Pengerjaan::find()->where(['mahasiswa_id' => $id, 'kode_soal' => 'Soal 4'])->average('skor') ?? 0;
-            $skor_ai = ($skor_soal1 + $skor_soal2 + $skor_soal3 + $skor_soal4) / 4;
-            $skor_sikap = $mahasiswa->nilai_sikap ?? 0;
-            $skor_disiplin = $mahasiswa->nilai_kedisiplinan ?? 0;
-            $skor_manual = ($skor_sikap + $skor_disiplin) / 2;
-            $nilai_akhir = ($skor_manual * 0.7) + ($skor_ai * 0.3);
-            $mahasiswa->nilai_akhir = $nilai_akhir;
-            if ($mahasiswa->save(false)) {
-                return [
-                    'status' => 'success',
-                    'message' => 'Tersimpan',
-                    'nilai_akhir' => round($nilai_akhir, 2) // Kirim kembali nilai akhir yang baru
-                ];
-            } else {
-                return ['status' => 'error', 'message' => 'Gagal menyimpan', 'errors' => $mahasiswa->errors];
-            }
         }
         return ['status' => 'error', 'message' => 'Invalid request'];
+    }
+
+    public function actionConfirmNilai()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $id = Yii::$app->request->post('id');
+        $m = \app\models\Mahasiswa::findOne($id);
+        if (!$m) {
+            return ['success' => false, 'message' => 'Mahasiswa tidak ditemukan'];
+        }
+        // Tandai konfirmasi dengan flag=9 (konfirmasi nilai akhir)
+        $m->flag = 9;
+        if ($m->save(false)) {
+            return ['success' => true];
+        }
+        return ['success' => false, 'message' => 'Gagal menyimpan'];
+    }
+
+    public function actionUnconfirmNilai()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $id = Yii::$app->request->post('id');
+        $m = \app\models\Mahasiswa::findOne($id);
+        if (!$m) {
+            return ['success' => false, 'message' => 'Mahasiswa tidak ditemukan'];
+        }
+        // Hapus tanda konfirmasi (kembali ke 0)
+        $m->flag = 0;
+        if ($m->save(false)) {
+            return ['success' => true];
+        }
+        return ['success' => false, 'message' => 'Gagal menyimpan'];
     }
     // public function actionUpdateNilaiManual()
     // {

@@ -47,7 +47,9 @@ $this->title = 'Penilaian Akhir Mahasiswa';
                                 [
                                     'attribute' => 'mahasiswa_id',
                                     'label' => 'NIM Mahasiswa',
-                                    'value' => fn($model) => $model->mahasiswa->nim ?? '-',
+                                    'value' => function($model) {
+                                        return $model->mahasiswa ? ($model->mahasiswa->nim ?? '-') : '-';
+                                    },
                                 ],
                                 'jawaban_teks:ntext',
                                 [
@@ -86,8 +88,7 @@ $this->title = 'Penilaian Akhir Mahasiswa';
                                     'label' => 'Skor',
                                     'format' => 'raw',
                                     'value' => function ($model) {
-                                        $disabled = (empty(trim($model->umpan_balik))) ? 'disabled' : '';
-
+                                        // Skor dibuat tidak aktif (readonly)
                                         return Html::input(
                                             'number',
                                             "skor[{$model->id}]",
@@ -98,7 +99,7 @@ $this->title = 'Penilaian Akhir Mahasiswa';
                                                 'max' => 100,
                                                 'step' => 1,
                                                 'style' => 'width:80px; margin:auto;',
-                                                $disabled => true,
+                                                'disabled' => true,
                                                 'data-id' => $model->id,
                                             ]
                                         );
@@ -106,8 +107,39 @@ $this->title = 'Penilaian Akhir Mahasiswa';
                                 ],
                                 [
                                     'label' => 'Nilai Akhir',
+                                    'format' => 'raw',
                                     'value' => function ($model) {
-                                        return round($model->mahasiswa->nilai_akhir ?? 0, 2);
+                                        $m = $model->mahasiswa;
+                                        if (!$m) {
+                                            return '-';
+                                        }
+
+                                        $id = $m->id;
+                                        $value = $m->nilai_akhir ?? '';
+                                        $isConfirmed = ($m->flag == 9);
+
+                                        $input = Html::input('number', "nilai_akhir[{$id}]", $value, [
+                                            'class' => 'form-control text-center nilai-akhir-input',
+                                            'step' => '0.01',
+                                            'style' => 'width:100px; margin:auto;',
+                                            'data-id' => $id,
+                                            'disabled' => $isConfirmed,
+                                            'id' => 'nilai-akhir-' . $id,
+                                        ]);
+
+                                        $btnConfirm = Html::button('Konfirmasi', [
+                                            'class' => 'btn btn-success btn-sm btn-konfirmasi',
+                                            'data-id' => $id,
+                                            'style' => 'margin-left:8px;' . ($isConfirmed ? 'display:none;' : '')
+                                        ]);
+
+                                        $btnEdit = Html::button('Edit', [
+                                            'class' => 'btn btn-secondary btn-sm btn-edit-nilai',
+                                            'data-id' => $id,
+                                            'style' => 'margin-left:8px;' . ($isConfirmed ? '' : 'display:none;')
+                                        ]);
+
+                                        return '<div class="d-flex align-items-center justify-content-center">' . $input . $btnConfirm . $btnEdit . '</div>';
                                     },
                                 ],
                             ],
@@ -208,6 +240,83 @@ $(document).on('change', '.skor-input', function() {
 JS;
 
 $this->registerJs($skorScript);
+// JS untuk handle nilai akhir dan konfirmasi
+$confirmUrl = Url::to(['pengerjaan/confirm-nilai']);
+$unconfirmUrl = Url::to(['pengerjaan/unconfirm-nilai']);
+$updateNilaiUrl = Url::to(['pengerjaan/update-nilai-manual']);
+$csrf = Yii::$app->request->getCsrfToken();
+
+$nilaiScript = <<<JS
+// Simpan nilai akhir ketika diubah
+$(document).on('change', '.nilai-akhir-input', function() {
+    const id = $(this).data('id');
+    const val = $(this).val();
+    if ($(this).is(':disabled')) return;
+    $.ajax({
+        url: '$updateNilaiUrl',
+        type: 'POST',
+        data: {id: id, field: 'nilai_akhir', value: val, _csrf: '$csrf'},
+        success: function(res) {
+            if (res.status === 'success') {
+                alert('Nilai akhir tersimpan.');
+                $('#nilai-akhir-' + id).val(res.nilai_akhir);
+            } else {
+                alert('Gagal menyimpan: ' + (res.message || ''));
+            }
+        },
+        error: function() {
+            alert('Gagal menghubungi server.');
+        }
+    });
+});
+
+// Konfirmasi nilai akhir
+$(document).on('click', '.btn-konfirmasi', function() {
+    const id = $(this).data('id');
+    const btn = $(this);
+    $.ajax({
+        url: '$confirmUrl',
+        type: 'POST',
+        data: {id: id, _csrf: '$csrf'},
+        success: function(res) {
+            if (res.success) {
+                // disable input, toggle buttons
+                $('.nilai-akhir-input[data-id="' + id + '"]').prop('disabled', true);
+                btn.hide();
+                $('.btn-edit-nilai[data-id="' + id + '"]').show();
+                alert('Nilai dikonfirmasi.');
+            } else {
+                alert('Gagal konfirmasi: ' + (res.message || ''));
+            }
+        },
+        error: function() { alert('Gagal menghubungi server.'); }
+    });
+});
+
+// Edit / batal konfirmasi
+$(document).on('click', '.btn-edit-nilai', function() {
+    const id = $(this).data('id');
+    const btn = $(this);
+    $.ajax({
+        url: '$unconfirmUrl',
+        type: 'POST',
+        data: {id: id, _csrf: '$csrf'},
+        success: function(res) {
+            if (res.success) {
+                // enable input, toggle buttons
+                $('.nilai-akhir-input[data-id="' + id + '"]').prop('disabled', false);
+                btn.hide();
+                $('.btn-konfirmasi[data-id="' + id + '"]').show();
+            } else {
+                alert('Gagal: ' + (res.message || ''));
+            }
+        },
+        error: function() { alert('Gagal menghubungi server.'); }
+    });
+});
+JS;
+
+$this->registerJs($nilaiScript);
 ?>
 
 <?php

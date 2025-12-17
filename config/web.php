@@ -75,7 +75,8 @@ $config = [
 
         'gemini' => [
             'class' => 'app\components\GeminiApi',
-            'apiKey' => 'AIzaSyCz68S7NVIWMwT2z56Wk2hR7Q0M8pD-n5s',
+            'apiKey' => 'AIzaSyCDHBEr42kb217r-oCjm88KfaP17wRCqOA',
+            // 'apiKey' => 'AIzaSyCz68S7NVIWMwT2z56Wk2hR7Q0M8pD-n5s',
         ],
     ],
     'params' => $params,
